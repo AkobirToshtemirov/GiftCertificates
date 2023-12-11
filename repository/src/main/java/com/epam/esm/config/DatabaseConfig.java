@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @ComponentScan("com.epam.esm")
-@PropertySource("classpath:application.yml")
+@PropertySource("classpath:application.properties")
 public class DatabaseConfig {
     @Value("${database.driver.class.name}")
     private String driverClassName;

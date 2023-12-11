@@ -6,6 +6,6 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @Profile("dev")
-@PropertySource("classpath:dev.yml")
+@PropertySource("classpath:dev.properties")
 public class DevProfileConfig {
 }

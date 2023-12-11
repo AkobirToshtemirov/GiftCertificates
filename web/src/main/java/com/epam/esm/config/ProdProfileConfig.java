@@ -6,6 +6,6 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @Profile("prod")
-@PropertySource("classpath:prod.yml")
+@PropertySource("classpath:prod.properties")
 public class ProdProfileConfig {
 }

@@ -7,49 +7,31 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import static com.epam.esm.constants.ErrorCodeConstants.*;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({
-            NotFoundException.class,
-            OperationException.class
-    })
-    public ResponseEntity<ApiErrorResponseDTO> handleApiException(RuntimeException ex) {
-        HttpStatus status = resolveHttpStatus(ex);
-        int errorCode = calculateErrorCode(status, ex);
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ApiErrorResponseDTO> handleNotFoundException(NotFoundException ex) {
+        return buildErrorResponse(ex, HttpStatus.NOT_FOUND, NOT_FOUND);
+    }
 
-        ApiErrorResponseDTO apiError = new ApiErrorResponseDTO(ex.getMessage(), errorCode, status);
-        return ResponseEntity.status(status).body(apiError);
+    @ExceptionHandler(OperationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiErrorResponseDTO> handleOperationException(OperationException ex) {
+        return buildErrorResponse(ex, HttpStatus.BAD_REQUEST, OPERATION_ERROR);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ApiErrorResponseDTO> handleException(Exception ex) {
-        int errorCode = 50001;
-        ApiErrorResponseDTO apiError = new ApiErrorResponseDTO("Internal Server Error: " + ex.getMessage(), errorCode, HttpStatus.INTERNAL_SERVER_ERROR);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+    public ResponseEntity<ApiErrorResponseDTO> handleGeneralException(Exception ex) {
+        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, OTHER_EXCEPTION);
     }
 
-    private HttpStatus resolveHttpStatus(Exception ex) {
-        ResponseStatus responseStatus = ex.getClass().getAnnotation(ResponseStatus.class);
-        return (responseStatus != null) ? responseStatus.value() : HttpStatus.INTERNAL_SERVER_ERROR;
-    }
-
-    private int calculateErrorCode(HttpStatus httpStatus, Exception ex) {
-        int baseErrorCode;
-
-        if (httpStatus == HttpStatus.NOT_FOUND)
-            baseErrorCode = 40400;
-        else if (httpStatus == HttpStatus.BAD_REQUEST)
-            baseErrorCode = 40000;
-        else
-            baseErrorCode = 50000;
-
-        if (ex instanceof NotFoundException)
-            baseErrorCode += 1;
-        else if (ex instanceof OperationException)
-            baseErrorCode += 2;
-
-        return baseErrorCode;
+    private ResponseEntity<ApiErrorResponseDTO> buildErrorResponse(Exception ex, HttpStatus status, int errorCode) {
+        ApiErrorResponseDTO apiError = new ApiErrorResponseDTO(ex.getMessage(), errorCode, status);
+        return ResponseEntity.status(status).body(apiError);
     }
 }

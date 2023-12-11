@@ -1,7 +1,0 @@
-database:
-  driver:
-    class:
-      name: org.postgresql.Driver
-  url: jdbc:postgresql://server:5432/gift_certificates
-  username: user
-  password: password
