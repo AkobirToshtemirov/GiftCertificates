@@ -1,16 +1,19 @@
 package com.epam.esm.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class GiftCertificateTag {
     private Long id;
     private Long giftCertificateId;
     private Long tagId;
+
+    public GiftCertificateTag(Long giftCertificateId, Long tagId) {
+        this.giftCertificateId = giftCertificateId;
+        this.tagId = tagId;
+    }
 }

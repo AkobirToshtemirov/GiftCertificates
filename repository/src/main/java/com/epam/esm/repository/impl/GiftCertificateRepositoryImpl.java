@@ -47,7 +47,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 ps.setDouble(3, giftCertificate.getPrice());
                 ps.setDouble(4, giftCertificate.getDuration());
                 ps.setTimestamp(5, Timestamp.valueOf(giftCertificate.getCreatedDate()));
-                ps.setTimestamp(6, Timestamp.valueOf(giftCertificate.getLustUpdatedDate()));
+                ps.setTimestamp(6, Timestamp.valueOf(giftCertificate.getLastUpdatedDate()));
 
                 return ps;
             }, keyHolder);
@@ -90,7 +90,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                     giftCertificate.getDescription(),
                     giftCertificate.getPrice(),
                     giftCertificate.getDuration(),
-                    giftCertificate.getLustUpdatedDate(),
+                    giftCertificate.getLastUpdatedDate(),
                     giftCertificate.getId());
             if (updatedRows == 0) {
                 log.error("Gift certificate not found with id: {}", giftCertificate.getId());
@@ -157,7 +157,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                         giftCertificate.setPrice(resultSet.getDouble("price"));
                         giftCertificate.setDuration(resultSet.getDouble("duration"));
                         giftCertificate.setCreatedDate(resultSet.getTimestamp("created_date").toLocalDateTime());
-                        giftCertificate.setLustUpdatedDate(resultSet.getTimestamp("last_updated_date").toLocalDateTime());
+                        giftCertificate.setLastUpdatedDate(resultSet.getTimestamp("last_updated_date").toLocalDateTime());
                         certificateMap.put(id, giftCertificate);
                     }
                 }
