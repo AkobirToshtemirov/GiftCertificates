@@ -55,12 +55,6 @@ public class GiftCertificateTagRepositoryImpl implements GiftCertificateTagRepos
     }
 
     @Override
-    public boolean hasAssociation(Long giftCertificateId, Long tagId) {
-        GiftCertificateTag giftCertificateTag = jdbcTemplate.queryForObject(FIND_ASSOCIATION_QUERY, new BeanPropertyRowMapper<>(GiftCertificateTag.class), giftCertificateId, tagId);
-        return Objects.isNull(giftCertificateTag);
-    }
-
-    @Override
     public List<GiftCertificateTag> findAssociationsByGiftCertificateId(Long giftCertificateId) throws GiftCertificateNotFoundException {
         try {
             return jdbcTemplate.query(FIND_BY_CERTIFICATE_ID_QUERY, new BeanPropertyRowMapper<>(GiftCertificateTag.class), giftCertificateId);

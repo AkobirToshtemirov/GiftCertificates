@@ -9,7 +9,5 @@ import java.util.List;
 public interface GiftCertificateTagRepository {
     GiftCertificateTag save(GiftCertificateTag giftCertificateTag) throws GiftCertificateOperationException;
 
-    boolean hasAssociation(Long giftCertificateId, Long tagId);
-
     List<GiftCertificateTag> findAssociationsByGiftCertificateId(Long giftCertificateId) throws GiftCertificateNotFoundException;
 }

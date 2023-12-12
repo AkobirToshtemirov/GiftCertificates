@@ -15,7 +15,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -41,7 +40,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, new String[]{"id"});
                 ps.setString(1, giftCertificate.getName());
                 ps.setString(2, giftCertificate.getDescription());
                 ps.setDouble(3, giftCertificate.getPrice());

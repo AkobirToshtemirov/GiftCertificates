@@ -6,27 +6,27 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.GiftCertificateNotFoundException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.GiftCertificateTagRepository;
-import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository giftCertificateRepository;
-    private final TagRepository tagRepository;
+    private final TagService tagService;
     private final GiftCertificateTagRepository giftCertificateTagRepository;
 
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateRepository giftCertificateRepository, TagRepository tagRepository, GiftCertificateTagRepository giftCertificateTagRepository) {
+    public GiftCertificateServiceImpl(GiftCertificateRepository giftCertificateRepository, TagService tagService, GiftCertificateTagRepository giftCertificateTagRepository) {
         this.giftCertificateRepository = giftCertificateRepository;
-        this.tagRepository = tagRepository;
+        this.tagService = tagService;
         this.giftCertificateTagRepository = giftCertificateTagRepository;
     }
 
@@ -36,7 +36,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         giftCertificate.setLastUpdatedDate(LocalDateTime.now());
 
         GiftCertificate createdCertificate = giftCertificateRepository.save(giftCertificate);
-        updateTags(giftCertificate.getTags(), createdCertificate);
+
+        List<Tag> tags = giftCertificate.getTags();
+        if (!CollectionUtils.isEmpty(tags)) {
+            updateTags(giftCertificate.getTags(), createdCertificate);
+        }
 
         return createdCertificate;
     }
@@ -102,27 +106,25 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return certificates;
     }
 
-    private void updateTags(List<Tag> tags, GiftCertificate certificate) {
-        for (Tag tag : tags) {
-            Optional<Tag> tagOptional = tagRepository.findByName(tag.getName());
-
-            if (tagOptional.isPresent())
-                tag.setId(tagOptional.get().getId());
+    private void updateTags(List<Tag> updatedTags, GiftCertificate certificate) {
+        for (Tag tag : updatedTags) {
+            Tag existingTag = tagService.findTagByName(tag.getName());
+            Tag savedTag;
+            if (existingTag != null)
+                savedTag = existingTag;
             else
-                tag.setId(tagRepository.save(tag).getId());
-
-            if (!giftCertificateTagRepository.hasAssociation(certificate.getId(), tag.getId()))
-                giftCertificateTagRepository.save(new GiftCertificateTag(certificate.getId(), tag.getId()));
+                savedTag = tagService.createTag(tag);
+            tag.setId(savedTag.getId());
+            giftCertificateTagRepository.save(new GiftCertificateTag(certificate.getId(), tag.getId()));
         }
-        certificate.setTags(tags);
+        certificate.setTags(updatedTags);
     }
 
     private void addTags(GiftCertificate certificate) {
         List<GiftCertificateTag> associations = giftCertificateTagRepository.findAssociationsByGiftCertificateId(certificate.getId());
 
         List<Tag> tags = associations.stream()
-                .map(association -> tagRepository.findById(association.getTagId()))
-                .flatMap(optional -> optional.map(Stream::of).orElseGet(Stream::empty))
+                .map(association -> tagService.findTagById(association.getTagId()))
                 .collect(Collectors.toList());
 
         certificate.setTags(tags);

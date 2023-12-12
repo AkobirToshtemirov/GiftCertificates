@@ -15,7 +15,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,7 +41,7 @@ public class TagRepositoryImpl implements TagRepository {
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, new String[]{"id"});
                 ps.setString(1, tag.getName());
                 return ps;
             }, keyHolder);
@@ -68,13 +67,12 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public Optional<Tag> findByName(String name) throws TagNotFoundException {
+    public Optional<Tag> findByName(String name) {
         try {
             Tag tag = jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, new BeanPropertyRowMapper<>(Tag.class), name);
             return Optional.ofNullable(tag);
         } catch (EmptyResultDataAccessException e) {
-            log.error("Tag not found with name: {}", name, e);
-            throw new TagNotFoundException("Tag not found with name: {}" + name, e);
+            return Optional.empty();
         }
     }
 
