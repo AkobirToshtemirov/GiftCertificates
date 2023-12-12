@@ -3,7 +3,7 @@ package com.epam.esm.service.impl;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.GiftCertificateTag;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.GiftCertificateNotFoundException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.GiftCertificateTagRepository;
 import com.epam.esm.repository.TagRepository;
@@ -59,14 +59,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             return certificate;
         }
 
-        throw new NotFoundException("Gift Certificate Not found with id: " + id);
+        throw new GiftCertificateNotFoundException("Gift Certificate Not found with id: " + id);
     }
 
     @Override
     public GiftCertificate updateGiftCertificate(Long id, GiftCertificate updatedGiftCertificate) {
         GiftCertificate existingGiftCertificate = giftCertificateRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Gift Certificate Not found with id: " + id));
+                .orElseThrow(() -> new GiftCertificateNotFoundException("Gift Certificate Not found with id: " + id));
 
         if (updatedGiftCertificate.getName() != null)
             existingGiftCertificate.setName(updatedGiftCertificate.getName());

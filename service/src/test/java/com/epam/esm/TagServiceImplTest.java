@@ -1,7 +1,7 @@
 package com.epam.esm;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.TagNotFoundException;
 import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.impl.TagServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class TagServiceImplTest {
     private TagServiceImpl tagService;
 
     @Test
-    void findTagById_ShouldReturnExpectedTag_WhenTagExists() throws NotFoundException {
+    void findTagById_ShouldReturnExpectedTag_WhenTagExists() throws TagNotFoundException {
         // Arrange
         when(mockTagRepository.findById(TAG_1.getId())).thenReturn(Optional.of(TAG_1));
 
@@ -45,13 +45,13 @@ class TagServiceImplTest {
         when(mockTagRepository.findById(TAG_1.getId())).thenReturn(Optional.empty());
 
         // Act and Assert
-        assertThrows(NotFoundException.class,
+        assertThrows(TagNotFoundException.class,
                 () -> tagService.findTagById(TAG_1.getId()),
                 "Tag should not be found, and TagNotFoundException should be thrown");
     }
 
     @Test
-    void findAllTags_ShouldReturnExpectedTagList() throws NotFoundException {
+    void findAllTags_ShouldReturnExpectedTagList() throws TagNotFoundException {
         // Arrange
         when(mockTagRepository.findAll()).thenReturn(TAG_LIST);
 
@@ -63,7 +63,7 @@ class TagServiceImplTest {
     }
 
     @Test
-    void findTagByName_ShouldReturnExpectedTag_WhenTagExists() throws NotFoundException {
+    void findTagByName_ShouldReturnExpectedTag_WhenTagExists() throws TagNotFoundException {
         // Arrange
         when(mockTagRepository.findByName(TAG_1.getName())).thenReturn(Optional.of(TAG_1));
 

@@ -1,7 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.TagNotFoundException;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class TagServiceImpl implements TagService {
         Optional<Tag> tag = tagRepository.findById(id);
         if (tag.isPresent())
             return tag.get();
-        throw new NotFoundException("Tag not found with the id: " + id);
+        throw new TagNotFoundException("Tag not found with the id: " + id);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class TagServiceImpl implements TagService {
         Optional<Tag> tag = tagRepository.findByName(name);
         if (tag.isPresent())
             return tag.get();
-        throw new NotFoundException("Tag not found with the name: " + name);
+        throw new TagNotFoundException("Tag not found with the name: " + name);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.NotFoundException;
-import com.epam.esm.exception.OperationException;
+import com.epam.esm.exception.TagNotFoundException;
+import com.epam.esm.exception.TagOperationException;
 import com.epam.esm.repository.TagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public Tag save(Tag tag) throws OperationException {
+    public Tag save(Tag tag) throws TagOperationException {
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -52,49 +52,49 @@ public class TagRepositoryImpl implements TagRepository {
             return tag;
         } catch (DataAccessException e) {
             log.error("Error has occurred while saving tag", e);
-            throw new OperationException("Error has occurred while saving tag", e);
+            throw new TagOperationException("Error has occurred while saving tag", e);
         }
     }
 
     @Override
-    public Optional<Tag> findById(Long id) throws NotFoundException {
+    public Optional<Tag> findById(Long id) throws TagNotFoundException {
         try {
             Tag tag = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, new BeanPropertyRowMapper<>(Tag.class), id);
             return Optional.ofNullable(tag);
         } catch (EmptyResultDataAccessException e) {
             log.error("Tag not found with id: {}", id, e);
-            throw new NotFoundException("Tag not found with id: " + id, e);
+            throw new TagNotFoundException("Tag not found with id: " + id, e);
         }
     }
 
     @Override
-    public Optional<Tag> findByName(String name) throws NotFoundException {
+    public Optional<Tag> findByName(String name) throws TagNotFoundException {
         try {
             Tag tag = jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, new BeanPropertyRowMapper<>(Tag.class), name);
             return Optional.ofNullable(tag);
         } catch (EmptyResultDataAccessException e) {
             log.error("Tag not found with name: {}", name, e);
-            throw new NotFoundException("Tag not found with name: {}" + name, e);
+            throw new TagNotFoundException("Tag not found with name: {}" + name, e);
         }
     }
 
     @Override
-    public List<Tag> findAll() throws NotFoundException {
+    public List<Tag> findAll() throws TagNotFoundException {
         try {
             return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(Tag.class));
         } catch (RuntimeException e) {
             log.error("Error has occurred while getting all tags");
-            throw new NotFoundException("No tags found");
+            throw new TagNotFoundException("No tags found");
         }
     }
 
     @Override
-    public void delete(Long id) throws OperationException {
+    public void delete(Long id) throws TagOperationException {
         try {
             jdbcTemplate.update(DELETE_QUERY, id);
         } catch (Exception e) {
             log.error("Error has occurred while deleting tag with id = {}", id, e);
-            throw new OperationException("Failed to delete tag: " + e.getMessage());
+            throw new TagOperationException("Failed to delete tag: " + e.getMessage());
         }
     }
 }

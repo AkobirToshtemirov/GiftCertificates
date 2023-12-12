@@ -1,18 +1,15 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificateTag;
-import com.epam.esm.exception.NotFoundException;
-import com.epam.esm.exception.OperationException;
+import com.epam.esm.exception.GiftCertificateNotFoundException;
+import com.epam.esm.exception.GiftCertificateOperationException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface GiftCertificateTagRepository {
-    GiftCertificateTag save(GiftCertificateTag giftCertificateTag) throws OperationException;
-
-    Optional<GiftCertificateTag> findById(Long id) throws NotFoundException;
+    GiftCertificateTag save(GiftCertificateTag giftCertificateTag) throws GiftCertificateOperationException;
 
     boolean hasAssociation(Long giftCertificateId, Long tagId);
 
-    List<GiftCertificateTag> findAssociationsByGiftCertificateId(Long giftCertificateId) throws NotFoundException;
+    List<GiftCertificateTag> findAssociationsByGiftCertificateId(Long giftCertificateId) throws GiftCertificateNotFoundException;
 }

@@ -1,8 +1,8 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.exception.NotFoundException;
-import com.epam.esm.exception.OperationException;
+import com.epam.esm.exception.GiftCertificateNotFoundException;
+import com.epam.esm.exception.GiftCertificateOperationException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public GiftCertificate save(GiftCertificate giftCertificate) throws OperationException {
+    public GiftCertificate save(GiftCertificate giftCertificate) throws GiftCertificateOperationException {
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -57,33 +57,33 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             return giftCertificate;
         } catch (DataAccessException e) {
             log.error("Error occurred while saving gift certificate", e);
-            throw new OperationException("Error occurred while saving gift certificate", e);
+            throw new GiftCertificateOperationException("Error occurred while saving gift certificate", e);
         }
     }
 
     @Override
-    public Optional<GiftCertificate> findById(Long id) throws NotFoundException {
+    public Optional<GiftCertificate> findById(Long id) throws GiftCertificateNotFoundException {
         try {
             GiftCertificate giftCertificate = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, new BeanPropertyRowMapper<>(GiftCertificate.class), id);
             return Optional.ofNullable(giftCertificate);
         } catch (EmptyResultDataAccessException e) {
             log.error("Gift certificate not found with id: {}", id, e);
-            throw new NotFoundException("Gift certificate not found with id: " + id, e);
+            throw new GiftCertificateNotFoundException("Gift certificate not found with id: " + id, e);
         }
     }
 
     @Override
-    public List<GiftCertificate> findAll() throws NotFoundException {
+    public List<GiftCertificate> findAll() throws GiftCertificateNotFoundException {
         try {
             return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(GiftCertificate.class));
         } catch (EmptyResultDataAccessException e) {
             log.error("No gift certificates found", e);
-            throw new NotFoundException("No gift certificates found", e);
+            throw new GiftCertificateNotFoundException("No gift certificates found", e);
         }
     }
 
     @Override
-    public void update(GiftCertificate giftCertificate) throws NotFoundException, OperationException {
+    public void update(GiftCertificate giftCertificate) throws GiftCertificateNotFoundException, GiftCertificateOperationException {
         try {
             int updatedRows = jdbcTemplate.update(UPDATE_QUERY,
                     giftCertificate.getName(),
@@ -94,26 +94,26 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                     giftCertificate.getId());
             if (updatedRows == 0) {
                 log.error("Gift certificate not found with id: {}", giftCertificate.getId());
-                throw new NotFoundException("Gift certificate not found with id: " + giftCertificate.getId());
+                throw new GiftCertificateNotFoundException("Gift certificate not found with id: " + giftCertificate.getId());
             }
         } catch (DataAccessException e) {
             log.error("Error occurred while updating gift certificate with id: {}", giftCertificate.getId(), e);
-            throw new OperationException("Error occurred while updating gift certificate", e);
+            throw new GiftCertificateOperationException("Error occurred while updating gift certificate", e);
         }
     }
 
     @Override
-    public void delete(Long id) throws OperationException {
+    public void delete(Long id) throws GiftCertificateOperationException {
         try {
             jdbcTemplate.update(DELETE_QUERY, id);
         } catch (DataAccessException e) {
             log.error("Error occurred while deleting gift certificate with id: {}", id, e);
-            throw new OperationException("Error occurred while deleting gift certificate", e);
+            throw new GiftCertificateOperationException("Error occurred while deleting gift certificate", e);
         }
     }
 
     @Override
-    public List<GiftCertificate> findCertificatesByCriteria(String tagName, String search, String sortBy, boolean ascending) throws OperationException {
+    public List<GiftCertificate> findCertificatesByCriteria(String tagName, String search, String sortBy, boolean ascending) throws GiftCertificateOperationException {
         StringBuilder queryBuilder = new StringBuilder("SELECT gc.*, t.* FROM gift_certificates gc ");
         queryBuilder.append("LEFT JOIN gift_certificate_tags gct ON gc.id = gct.gift_certificate_id ");
         queryBuilder.append("LEFT JOIN tags t ON gct.tag_id = t.id ");
@@ -165,7 +165,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             });
         } catch (DataAccessException e) {
             log.error("Error has occurred while searching for certificates by criteria", e);
-            throw new OperationException("Error has occurred while searching for certificates by criteria", e);
+            throw new GiftCertificateOperationException("Error has occurred while searching for certificates by criteria", e);
         }
     }
 

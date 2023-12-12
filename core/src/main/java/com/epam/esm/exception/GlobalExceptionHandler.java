@@ -1,6 +1,6 @@
-package com.epam.esm.core.exception;
+package com.epam.esm.exception;
 
-import com.epam.esm.core.utils.ApiErrorResponse;
+import com.epam.esm.dto.ErrorResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,19 +16,19 @@ public class GlobalExceptionHandler {
             TagNotFoundException.class,
             TagOperationException.class
     })
-    public ResponseEntity<ApiErrorResponse> handleApiException(RuntimeException ex) {
+    public ResponseEntity<ErrorResponseDTO> handleApiException(RuntimeException ex) {
         HttpStatus status = resolveHttpStatus(ex);
         int errorCode = calculateErrorCode(status, ex);
 
-        ApiErrorResponse apiError = new ApiErrorResponse(ex.getMessage(), errorCode, status);
+        ErrorResponseDTO apiError = new ErrorResponseDTO(ex.getMessage(), errorCode, status);
         return ResponseEntity.status(status).body(apiError);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ApiErrorResponse> handleException(Exception ex) {
+    public ResponseEntity<ErrorResponseDTO> handleException(Exception ex) {
         int errorCode = 50001;
-        ApiErrorResponse apiError = new ApiErrorResponse("Internal Server Error: " + ex.getMessage(), errorCode, HttpStatus.INTERNAL_SERVER_ERROR);
+        ErrorResponseDTO apiError = new ErrorResponseDTO("Internal Server Error: " + ex.getMessage(), errorCode, HttpStatus.INTERNAL_SERVER_ERROR);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
     }
 
@@ -48,11 +48,11 @@ public class GlobalExceptionHandler {
         }
 
         if (ex instanceof GiftCertificateNotFoundException || ex instanceof GiftCertificateOperationException) {
-            return baseErrorCode + 1; // Add 1 for certificate-related errors
+            return baseErrorCode + 1;
         } else if (ex instanceof TagNotFoundException || ex instanceof TagOperationException) {
-            return baseErrorCode + 2; // Add 2 for tag-related errors
+            return baseErrorCode + 2;
         } else {
-            return baseErrorCode; // Default error code for other cases
+            return baseErrorCode;
         }
     }
 }
