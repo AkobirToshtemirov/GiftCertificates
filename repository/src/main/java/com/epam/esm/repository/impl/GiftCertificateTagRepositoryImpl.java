@@ -23,8 +23,6 @@ import java.util.Objects;
 public class GiftCertificateTagRepositoryImpl implements GiftCertificateTagRepository {
     private static final String INSERT_QUERY = "INSERT INTO gift_certificate_tags (gift_certificate_id, tag_id) VALUES (?, ?)";
     private static final String FIND_BY_CERTIFICATE_ID_QUERY = "SELECT * FROM gift_certificate_tags WHERE gift_certificate_id = ?";
-    private static final String FIND_ASSOCIATION_QUERY = "SELECT * FROM gift_certificate_tags WHERE gift_certificate_id = ? AND tag_id =? ";
-
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -38,7 +36,7 @@ public class GiftCertificateTagRepositoryImpl implements GiftCertificateTagRepos
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, new String[]{"id"});
                 ps.setLong(1, giftCertificateTag.getGiftCertificateId());
                 ps.setLong(2, giftCertificateTag.getTagId());
 
