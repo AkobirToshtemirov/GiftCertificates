@@ -3,6 +3,7 @@ package com.epam.esm.service;
 import com.epam.esm.entity.Tag;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TagService {
     Tag createTag(Tag tag);
@@ -11,7 +12,7 @@ public interface TagService {
 
     Tag findTagById(Long id);
 
-    Tag findTagByName(String name);
+    Optional<Tag> findTagByName(String name);
 
     void deleteTag(Long id);
 }

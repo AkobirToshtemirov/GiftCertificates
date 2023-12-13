@@ -39,11 +39,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag findTagByName(String name) {
-        Optional<Tag> tag = tagRepository.findByName(name);
-        if (tag.isPresent())
-            return tag.get();
-        throw new TagNotFoundException("Tag not found with the name: " + name);
+    public Optional<Tag> findTagByName(String name) {
+        return tagRepository.findByName(name);
     }
 
     @Override

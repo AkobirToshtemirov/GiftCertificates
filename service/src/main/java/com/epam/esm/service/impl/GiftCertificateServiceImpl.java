@@ -14,6 +14,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public GiftCertificate createGiftCertificate(GiftCertificate giftCertificate) {
         giftCertificate.setCreatedDate(LocalDateTime.now());
         giftCertificate.setLastUpdatedDate(LocalDateTime.now());
+
 
         GiftCertificate createdCertificate = giftCertificateRepository.save(giftCertificate);
 
@@ -108,12 +110,8 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     private void updateTags(List<Tag> updatedTags, GiftCertificate certificate) {
         for (Tag tag : updatedTags) {
-            Tag existingTag = tagService.findTagByName(tag.getName());
-            Tag savedTag;
-            if (existingTag != null)
-                savedTag = existingTag;
-            else
-                savedTag = tagService.createTag(tag);
+            Optional<Tag> existingTag = tagService.findTagByName(tag.getName());
+            Tag savedTag = existingTag.orElseGet(() -> tagService.createTag(tag));
             tag.setId(savedTag.getId());
             giftCertificateTagRepository.save(new GiftCertificateTag(certificate.getId(), tag.getId()));
         }

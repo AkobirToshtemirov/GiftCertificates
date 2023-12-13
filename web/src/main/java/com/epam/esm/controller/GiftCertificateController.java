@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/gift-certificates",
-        consumes = {"application/json"},
-        produces = {"application/json"})
+@RequestMapping("/gift-certificates")
 public class GiftCertificateController {
     private final GiftCertificateService giftCertificateService;
 

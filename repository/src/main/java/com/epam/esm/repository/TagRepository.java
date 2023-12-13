@@ -12,7 +12,7 @@ public interface TagRepository {
 
     Optional<Tag> findById(Long id) throws TagNotFoundException;
 
-    Optional<Tag> findByName(String name) throws TagNotFoundException;
+    Optional<Tag> findByName(String name);
 
     List<Tag> findAll() throws TagNotFoundException;
 

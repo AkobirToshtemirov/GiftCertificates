@@ -84,13 +84,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public void update(GiftCertificate giftCertificate) throws GiftCertificateNotFoundException, GiftCertificateOperationException {
         try {
-            int updatedRows = jdbcTemplate.update(UPDATE_QUERY,
-                    giftCertificate.getName(),
-                    giftCertificate.getDescription(),
-                    giftCertificate.getPrice(),
-                    giftCertificate.getDuration(),
-                    giftCertificate.getLastUpdatedDate(),
-                    giftCertificate.getId());
+            int updatedRows = jdbcTemplate.update(UPDATE_QUERY, giftCertificate.getName(), giftCertificate.getDescription(), giftCertificate.getPrice(), giftCertificate.getDuration(), giftCertificate.getLastUpdatedDate(), giftCertificate.getId());
             if (updatedRows == 0) {
                 log.error("Gift certificate not found with id: {}", giftCertificate.getId());
                 throw new GiftCertificateNotFoundException("Gift certificate not found with id: " + giftCertificate.getId());
@@ -118,11 +112,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         queryBuilder.append("LEFT JOIN tags t ON gct.tag_id = t.id ");
         queryBuilder.append("WHERE 1=1 ");
 
-        if (tagName != null && !tagName.isEmpty())
-            queryBuilder.append("AND t.name = ? ");
+        if (tagName != null && !tagName.isEmpty()) queryBuilder.append("AND t.name = ? ");
 
-        if (search != null && !search.isEmpty())
-            queryBuilder.append("AND (gc.name LIKE ? OR gc.description LIKE ?) ");
+        if (search != null && !search.isEmpty()) queryBuilder.append("AND (gc.name LIKE ? OR gc.description LIKE ?) ");
 
         if (sortBy != null && !sortBy.isEmpty()) {
             String sortField = sortBy.equalsIgnoreCase("name") ? "gc.name" : "gc.created_date";
