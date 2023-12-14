@@ -30,7 +30,7 @@ GiftCertificateController:
 
   1. Develop web service for Gift Certificates system with the following entities (many-to-many):
   
-  ![Alt text]([https://www.example.com/image.jpg](https://github.com/AkobirToshtemirov/GiftCertificates/assets/88495573/72acc4d9-291f-4549-a52b-e5b62c194edd)
+  ![Alt text](https://github.com/AkobirToshtemirov/GiftCertificates/assets/88495573/72acc4d9-291f-4549-a52b-e5b62c194edd)
   
   2. CreateDate, LastUpdateDate - format ISO 8601 (https://en.wikipedia.org/wiki/ISO_8601). Example: 2018-08-29T06:12:15.156. More discussion here: https://stackoverflow.com/questions/3914404/how-to-get-current-moment-in-iso-8601-format-with-date-hour-and-minute Duration - in days (expiration period)
   3. The system should expose REST APIs to perform the following operations:
