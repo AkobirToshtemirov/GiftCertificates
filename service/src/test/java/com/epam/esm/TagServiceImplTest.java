@@ -31,7 +31,7 @@ class TagServiceImplTest {
     void findTagById_ShouldReturnExpectedTag_WhenTagExists() throws TagNotFoundException {
         when(mockTagRepository.findById(TAG_1.getId())).thenReturn(Optional.of(TAG_1));
 
-        Tag actualTag = tagService.findTagById(TAG_1.getId());
+        Tag actualTag = tagService.findById(TAG_1.getId());
 
         assertEquals("Actual tag should be equal to expected", TAG_1, actualTag);
     }
@@ -41,7 +41,7 @@ class TagServiceImplTest {
         when(mockTagRepository.findById(TAG_1.getId())).thenReturn(Optional.empty());
 
         assertThrows(TagNotFoundException.class,
-                () -> tagService.findTagById(TAG_1.getId()),
+                () -> tagService.findById(TAG_1.getId()),
                 "Tag should not be found, and TagNotFoundException should be thrown");
     }
 
@@ -49,7 +49,7 @@ class TagServiceImplTest {
     void findAllTags_ShouldReturnExpectedTagList() throws TagNotFoundException {
         when(mockTagRepository.findAll()).thenReturn(TAG_LIST);
 
-        Iterable<Tag> actualTags = tagService.findAllTags();
+        Iterable<Tag> actualTags = tagService.findAll();
 
         assertEquals("Actual tag list should be equal to expected", TAG_LIST, actualTags);
     }
@@ -69,7 +69,7 @@ class TagServiceImplTest {
         savingTag.setName(TAG_2.getName());
         when(mockTagRepository.save(savingTag)).thenReturn(TAG_2);
 
-        Tag actualTag = tagService.createTag(savingTag);
+        Tag actualTag = tagService.create(savingTag);
 
         assertEquals("Actual tag should be equal to expected", TAG_2, actualTag);
     }

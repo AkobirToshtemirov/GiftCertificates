@@ -3,6 +3,7 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.TagNotFoundException;
 import com.epam.esm.exception.TagOperationException;
+import com.epam.esm.repository.BaseRepository;
 import com.epam.esm.repository.TagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.Optional;
 
 @Slf4j
 @Repository
-public class TagRepositoryImpl implements TagRepository {
+public class TagRepositoryImpl implements BaseRepository<Tag>, TagRepository {
     private static final String INSERT_QUERY = "INSERT INTO tags (name) VALUES (?)";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM tags WHERE id = ?";
     private static final String FIND_BY_NAME_QUERY = "SELECT * FROM tags WHERE name = ?";
@@ -77,13 +78,8 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<Tag> findAll() throws TagNotFoundException {
-        try {
-            return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(Tag.class));
-        } catch (RuntimeException e) {
-            log.error("Error has occurred while getting all tags");
-            throw new TagNotFoundException("No tags found");
-        }
+    public List<Tag> findAll() {
+        return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(Tag.class));
     }
 
     @Override

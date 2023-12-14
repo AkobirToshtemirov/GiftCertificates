@@ -3,7 +3,9 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.GiftCertificateNotFoundException;
 import com.epam.esm.exception.GiftCertificateOperationException;
+import com.epam.esm.repository.BaseRepository;
 import com.epam.esm.repository.GiftCertificateRepository;
+import com.epam.esm.utils.CertificateQueryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -14,13 +16,15 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import static com.epam.esm.constants.Column.*;
+
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.util.*;
 
 @Slf4j
 @Repository
-public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
+public class GiftCertificateRepositoryImpl implements BaseRepository<GiftCertificate>, GiftCertificateRepository {
     private static final String INSERT_QUERY = "INSERT INTO gift_certificates (name, description, price, duration, created_date, last_updated_date) VALUES (?, ? ,?, ?, ?, ?)";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM gift_certificates WHERE id = ?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM gift_certificates";
@@ -40,7 +44,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, new String[]{"id"});
+                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, new String[]{ID});
                 ps.setString(1, giftCertificate.getName());
                 ps.setString(2, giftCertificate.getDescription());
                 ps.setDouble(3, giftCertificate.getPrice());
@@ -72,13 +76,8 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public List<GiftCertificate> findAll() throws GiftCertificateNotFoundException {
-        try {
-            return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(GiftCertificate.class));
-        } catch (EmptyResultDataAccessException e) {
-            log.error("No gift certificates found", e);
-            throw new GiftCertificateNotFoundException("No gift certificates found", e);
-        }
+    public List<GiftCertificate> findAll() {
+        return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(GiftCertificate.class));
     }
 
     @Override
@@ -107,48 +106,30 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Override
     public List<GiftCertificate> findCertificatesByCriteria(String tagName, String search, String sortBy, boolean ascending) throws GiftCertificateOperationException {
-        StringBuilder queryBuilder = new StringBuilder("SELECT gc.*, t.* FROM gift_certificates gc ");
-        queryBuilder.append("LEFT JOIN gift_certificate_tags gct ON gc.id = gct.gift_certificate_id ");
-        queryBuilder.append("LEFT JOIN tags t ON gct.tag_id = t.id ");
-        queryBuilder.append("WHERE 1=1 ");
-
-        if (tagName != null && !tagName.isEmpty()) queryBuilder.append("AND t.name = ? ");
-
-        if (search != null && !search.isEmpty()) queryBuilder.append("AND (gc.name LIKE ? OR gc.description LIKE ?) ");
-
-        if (sortBy != null && !sortBy.isEmpty()) {
-            String sortField = sortBy.equalsIgnoreCase("name") ? "gc.name" : "gc.created_date";
-            queryBuilder.append("ORDER BY ").append(sortField).append(ascending ? " ASC" : " DESC");
-        }
+        CertificateQueryBuilder queryBuilder = new CertificateQueryBuilder();
+        queryBuilder.addTagCriteria(tagName);
+        queryBuilder.addSearchCriteria(search);
+        queryBuilder.addSortingCriteria(sortBy, ascending);
 
         try {
-            List<Object> queryParams = new ArrayList<>();
+            String finalQuery = queryBuilder.build();
+            Object[] queryParams = queryBuilder.getQueryParams();
 
-            if (tagName != null && !tagName.isEmpty()) {
-                queryParams.add(tagName);
-            }
-
-            if (search != null && !search.isEmpty()) {
-                queryParams.add("%" + search + "%");
-                queryParams.add("%" + search + "%");
-            }
-
-            String finalQuery = queryBuilder.toString();
-            return jdbcTemplate.query(finalQuery, queryParams.toArray(), (resultSet) -> {
+            return jdbcTemplate.query(finalQuery, queryParams, (resultSet) -> {
                 Map<Long, GiftCertificate> certificateMap = new LinkedHashMap<>();
                 GiftCertificate giftCertificate;
                 while (resultSet.next()) {
-                    long id = resultSet.getLong("id");
+                    long id = resultSet.getLong(ID);
                     giftCertificate = certificateMap.get(id);
                     if (giftCertificate == null) {
                         giftCertificate = new GiftCertificate();
                         giftCertificate.setId(id);
-                        giftCertificate.setName(resultSet.getString("name"));
-                        giftCertificate.setDescription(resultSet.getString("description"));
-                        giftCertificate.setPrice(resultSet.getDouble("price"));
-                        giftCertificate.setDuration(resultSet.getDouble("duration"));
-                        giftCertificate.setCreatedDate(resultSet.getTimestamp("created_date").toLocalDateTime());
-                        giftCertificate.setLastUpdatedDate(resultSet.getTimestamp("last_updated_date").toLocalDateTime());
+                        giftCertificate.setName(resultSet.getString(NAME));
+                        giftCertificate.setDescription(resultSet.getString(DESCRIPTION));
+                        giftCertificate.setPrice(resultSet.getDouble(PRICE));
+                        giftCertificate.setDuration(resultSet.getDouble(DURATION));
+                        giftCertificate.setCreatedDate(resultSet.getTimestamp(CREATED_DATE).toLocalDateTime());
+                        giftCertificate.setLastUpdatedDate(resultSet.getTimestamp(LAST_UPDATED_DATE).toLocalDateTime());
                         certificateMap.put(id, giftCertificate);
                     }
                 }

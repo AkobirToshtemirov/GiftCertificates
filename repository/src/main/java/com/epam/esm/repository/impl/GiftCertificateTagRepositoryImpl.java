@@ -14,7 +14,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +31,7 @@ public class GiftCertificateTagRepositoryImpl implements GiftCertificateTagRepos
     }
 
     @Override
-    public GiftCertificateTag save(GiftCertificateTag giftCertificateTag) throws GiftCertificateOperationException {
+    public void save(GiftCertificateTag giftCertificateTag) throws GiftCertificateOperationException {
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
@@ -45,7 +44,6 @@ public class GiftCertificateTagRepositoryImpl implements GiftCertificateTagRepos
 
             giftCertificateTag.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
 
-            return giftCertificateTag;
         } catch (DataAccessException e) {
             log.error("Error occurred while saving gift certificate tag association", e);
             throw new GiftCertificateOperationException("Error occurred while saving gift certificate tag association", e);

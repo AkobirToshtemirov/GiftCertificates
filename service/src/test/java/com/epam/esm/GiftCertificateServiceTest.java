@@ -1,8 +1,12 @@
 package com.epam.esm;
 
+import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.GiftCertificateNotFoundException;
+import com.epam.esm.repository.BaseRepository;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.GiftCertificateTagRepository;
+import com.epam.esm.service.BaseService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -23,28 +27,32 @@ class GiftCertificateServiceTest {
     private GiftCertificateRepository mockGiftCertificateRepository;
 
     @Mock
-    private GiftCertificateTagRepository mockGiftCertificateTagRepository;
-
-    @Mock
     private TagService mockTagService;
+    @Mock
+    private GiftCertificateTagRepository mockGiftCertificateTagRepository;
+    @Mock
+    private BaseRepository<GiftCertificate> giftCertificateBaseRepository;
+    @Mock
+    private BaseService<Tag> tagBaseService;
+
 
     @InjectMocks
     private GiftCertificateServiceImpl giftCertificateService;
 
     @Test
     void findGiftCertificateById_ShouldReturnExpectedGiftCertificate_WhenGiftCertificateExists() throws GiftCertificateNotFoundException {
-        when(mockGiftCertificateRepository.findById(GIFT_CERTIFICATE_1.getId())).thenReturn(Optional.of(GIFT_CERTIFICATE_1));
+        when(giftCertificateBaseRepository.findById(GIFT_CERTIFICATE_1.getId())).thenReturn(Optional.of(GIFT_CERTIFICATE_1));
 
-        var actualGiftCertificate = giftCertificateService.findGiftCertificateById(GIFT_CERTIFICATE_1.getId());
+        var actualGiftCertificate = giftCertificateService.findById(GIFT_CERTIFICATE_1.getId());
 
         assertEquals("Actual gift certificate should be equal to expected", GIFT_CERTIFICATE_1, actualGiftCertificate);
     }
 
     @Test
     void findAllGiftCertificates_ShouldReturnExpectedGiftCertificateList() throws GiftCertificateNotFoundException {
-        when(mockGiftCertificateRepository.findAll()).thenReturn(GIFT_CERTIFICATE_LIST);
+        when(giftCertificateBaseRepository.findAll()).thenReturn(GIFT_CERTIFICATE_LIST);
 
-        var actualGiftCertificates = giftCertificateService.findAllGiftCertificates();
+        var actualGiftCertificates = giftCertificateService.findAll();
 
         assertEquals("Actual gift certificate list should be equal to expected", GIFT_CERTIFICATE_LIST, actualGiftCertificates);
     }
