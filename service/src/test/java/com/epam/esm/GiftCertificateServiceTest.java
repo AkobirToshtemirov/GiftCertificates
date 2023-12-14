@@ -23,10 +23,10 @@ class GiftCertificateServiceTest {
     private GiftCertificateRepository mockGiftCertificateRepository;
 
     @Mock
+    private TagService mockTagService;
+    @Mock
     private GiftCertificateTagRepository mockGiftCertificateTagRepository;
 
-    @Mock
-    private TagService mockTagService;
 
     @InjectMocks
     private GiftCertificateServiceImpl giftCertificateService;
@@ -35,7 +35,7 @@ class GiftCertificateServiceTest {
     void findGiftCertificateById_ShouldReturnExpectedGiftCertificate_WhenGiftCertificateExists() throws GiftCertificateNotFoundException {
         when(mockGiftCertificateRepository.findById(GIFT_CERTIFICATE_1.getId())).thenReturn(Optional.of(GIFT_CERTIFICATE_1));
 
-        var actualGiftCertificate = giftCertificateService.findGiftCertificateById(GIFT_CERTIFICATE_1.getId());
+        var actualGiftCertificate = giftCertificateService.findById(GIFT_CERTIFICATE_1.getId());
 
         assertEquals("Actual gift certificate should be equal to expected", GIFT_CERTIFICATE_1, actualGiftCertificate);
     }
@@ -44,7 +44,7 @@ class GiftCertificateServiceTest {
     void findAllGiftCertificates_ShouldReturnExpectedGiftCertificateList() throws GiftCertificateNotFoundException {
         when(mockGiftCertificateRepository.findAll()).thenReturn(GIFT_CERTIFICATE_LIST);
 
-        var actualGiftCertificates = giftCertificateService.findAllGiftCertificates();
+        var actualGiftCertificates = giftCertificateService.findAll();
 
         assertEquals("Actual gift certificate list should be equal to expected", GIFT_CERTIFICATE_LIST, actualGiftCertificates);
     }

@@ -14,24 +14,24 @@ import java.util.Optional;
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
 
+
     @Autowired
     public TagServiceImpl(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
     }
 
     @Override
-    public Tag createTag(Tag tag) {
-        Optional<Tag> existingTag = tagRepository.findByName(tag.getName());
-        return existingTag.orElse(tagRepository.save(tag));
+    public Tag create(Tag tag) {
+        return tagRepository.save(tag);
     }
 
     @Override
-    public List<Tag> findAllTags() {
+    public List<Tag> findAll() {
         return tagRepository.findAll();
     }
 
     @Override
-    public Tag findTagById(Long id) {
+    public Tag findById(Long id) {
         Optional<Tag> tag = tagRepository.findById(id);
         if (tag.isPresent())
             return tag.get();
@@ -39,12 +39,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Optional<Tag> findTagByName(String name) {
-        return tagRepository.findByName(name);
+    public void delete(Long id) {
+        tagRepository.delete(id);
     }
 
     @Override
-    public void deleteTag(Long id) {
-        tagRepository.delete(id);
+    public Optional<Tag> findTagByName(String name) {
+        return tagRepository.findByName(name);
     }
 }

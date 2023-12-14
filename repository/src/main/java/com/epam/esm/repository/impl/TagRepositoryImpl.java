@@ -77,13 +77,8 @@ public class TagRepositoryImpl implements TagRepository {
     }
 
     @Override
-    public List<Tag> findAll() throws TagNotFoundException {
-        try {
-            return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(Tag.class));
-        } catch (RuntimeException e) {
-            log.error("Error has occurred while getting all tags");
-            throw new TagNotFoundException("No tags found");
-        }
+    public List<Tag> findAll() {
+        return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(Tag.class));
     }
 
     @Override

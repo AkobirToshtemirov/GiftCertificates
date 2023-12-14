@@ -5,14 +5,6 @@ import com.epam.esm.entity.Tag;
 import java.util.List;
 import java.util.Optional;
 
-public interface TagService {
-    Tag createTag(Tag tag);
-
-    List<Tag> findAllTags();
-
-    Tag findTagById(Long id);
-
+public interface TagService extends BaseService<Tag> {
     Optional<Tag> findTagByName(String name);
-
-    void deleteTag(Long id);
 }
