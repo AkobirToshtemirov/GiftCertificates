@@ -29,11 +29,11 @@ GiftCertificateController:
 **Business Requirements:**
 
   1. Develop web service for Gift Certificates system with the following entities (many-to-many):
-    
-  ![Alt text](F:\Walpapers\2task-epam.png)
+
+    ![2task-epam](https://github.com/AkobirToshtemirov/GiftCertificates/assets/88495573/72acc4d9-291f-4549-a52b-e5b62c194edd)
   
-  2. CreateDate, LastUpdateDate - format ISO 8601 (https://en.wikipedia.org/wiki/ISO_8601). Example: 2018-08-29T06:12:15.156. More discussion here: https://stackoverflow.com/questions/3914404/how-to-get-current-moment-in-iso-8601-format-with-date-hour-and-minute Duration - in days (expiration period)
-  3. The system should expose REST APIs to perform the following operations:
+  3. CreateDate, LastUpdateDate - format ISO 8601 (https://en.wikipedia.org/wiki/ISO_8601). Example: 2018-08-29T06:12:15.156. More discussion here: https://stackoverflow.com/questions/3914404/how-to-get-current-moment-in-iso-8601-format-with-date-hour-and-minute Duration - in days (expiration period)
+  4. The system should expose REST APIs to perform the following operations:
     - CRUD operations for GiftCertificate. If new tags are passed during creation/modification – they should be created in the DB. For update operation - update only fields, that pass in request, others should not be updated. Batch insert is out of scope.
     - CRD operations for Tag.
     - Get certificates with tags (all params are optional and can be used in conjunction):
