@@ -4,10 +4,8 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.GiftCertificateTag;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.GiftCertificateNotFoundException;
-import com.epam.esm.repository.BaseRepository;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.GiftCertificateTagRepository;
-import com.epam.esm.service.BaseService;
 import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +19,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class GiftCertificateServiceImpl implements BaseService<GiftCertificate>, GiftCertificateService {
+public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository giftCertificateRepository;
     private final TagService tagService;
     private final GiftCertificateTagRepository giftCertificateTagRepository;
-    private final BaseRepository<GiftCertificate> baseRepository;
-    private final BaseService<Tag> baseTagService;
 
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateRepository giftCertificateRepository, TagService tagService, GiftCertificateTagRepository giftCertificateTagRepository, BaseRepository<GiftCertificate> baseRepository, BaseService<Tag> baseTagService) {
+    public GiftCertificateServiceImpl(GiftCertificateRepository giftCertificateRepository, TagService tagService, GiftCertificateTagRepository giftCertificateTagRepository) {
         this.giftCertificateRepository = giftCertificateRepository;
         this.tagService = tagService;
         this.giftCertificateTagRepository = giftCertificateTagRepository;
-        this.baseRepository = baseRepository;
-        this.baseTagService = baseTagService;
     }
 
     @Override
@@ -42,7 +36,7 @@ public class GiftCertificateServiceImpl implements BaseService<GiftCertificate>,
     public GiftCertificate create(GiftCertificate giftCertificate) {
         giftCertificate.setCreatedDate(LocalDateTime.now());
 
-        GiftCertificate createdCertificate = baseRepository.save(giftCertificate);
+        GiftCertificate createdCertificate = giftCertificateRepository.save(giftCertificate);
 
         List<Tag> tags = giftCertificate.getTags();
         if (!CollectionUtils.isEmpty(tags)) {
@@ -55,14 +49,14 @@ public class GiftCertificateServiceImpl implements BaseService<GiftCertificate>,
 
     @Override
     public List<GiftCertificate> findAll() {
-        List<GiftCertificate> giftCertificates = baseRepository.findAll();
+        List<GiftCertificate> giftCertificates = giftCertificateRepository.findAll();
         giftCertificates.forEach(this::addTags);
         return giftCertificates;
     }
 
     @Override
     public GiftCertificate findById(Long id) {
-        Optional<GiftCertificate> certificateOptional = baseRepository.findById(id);
+        Optional<GiftCertificate> certificateOptional = giftCertificateRepository.findById(id);
 
         if (certificateOptional.isPresent()) {
             GiftCertificate certificate = certificateOptional.get();
@@ -76,7 +70,7 @@ public class GiftCertificateServiceImpl implements BaseService<GiftCertificate>,
     @Override
     @Transactional
     public GiftCertificate update(Long id, GiftCertificate updatedGiftCertificate) {
-        GiftCertificate existingGiftCertificate = baseRepository
+        GiftCertificate existingGiftCertificate = giftCertificateRepository
                 .findById(id)
                 .orElseThrow(() -> new GiftCertificateNotFoundException("Gift Certificate Not found with id: " + id));
 
@@ -103,7 +97,7 @@ public class GiftCertificateServiceImpl implements BaseService<GiftCertificate>,
 
     @Override
     public void delete(Long id) {
-        baseRepository.delete(id);
+        giftCertificateRepository.delete(id);
     }
 
     @Override
@@ -116,7 +110,7 @@ public class GiftCertificateServiceImpl implements BaseService<GiftCertificate>,
     private void updateTags(List<Tag> updatedTags, GiftCertificate certificate) {
         for (Tag tag : updatedTags) {
             Optional<Tag> existingTag = tagService.findTagByName(tag.getName());
-            Tag savedTag = existingTag.orElseGet(() -> baseTagService.create(tag));
+            Tag savedTag = existingTag.orElseGet(() -> tagService.create(tag));
             tag.setId(savedTag.getId());
             giftCertificateTagRepository.save(new GiftCertificateTag(certificate.getId(), tag.getId()));
         }
@@ -127,7 +121,7 @@ public class GiftCertificateServiceImpl implements BaseService<GiftCertificate>,
         List<GiftCertificateTag> associations = giftCertificateTagRepository.findAssociationsByGiftCertificateId(certificate.getId());
 
         List<Tag> tags = associations.stream()
-                .map(association -> baseTagService.findById(association.getTagId()))
+                .map(association -> tagService.findById(association.getTagId()))
                 .collect(Collectors.toList());
 
         certificate.setTags(tags);

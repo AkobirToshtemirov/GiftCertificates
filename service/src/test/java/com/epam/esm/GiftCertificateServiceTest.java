@@ -1,12 +1,8 @@
 package com.epam.esm;
 
-import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.GiftCertificateNotFoundException;
-import com.epam.esm.repository.BaseRepository;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.repository.GiftCertificateTagRepository;
-import com.epam.esm.service.BaseService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.impl.GiftCertificateServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -30,10 +26,6 @@ class GiftCertificateServiceTest {
     private TagService mockTagService;
     @Mock
     private GiftCertificateTagRepository mockGiftCertificateTagRepository;
-    @Mock
-    private BaseRepository<GiftCertificate> giftCertificateBaseRepository;
-    @Mock
-    private BaseService<Tag> tagBaseService;
 
 
     @InjectMocks
@@ -41,7 +33,7 @@ class GiftCertificateServiceTest {
 
     @Test
     void findGiftCertificateById_ShouldReturnExpectedGiftCertificate_WhenGiftCertificateExists() throws GiftCertificateNotFoundException {
-        when(giftCertificateBaseRepository.findById(GIFT_CERTIFICATE_1.getId())).thenReturn(Optional.of(GIFT_CERTIFICATE_1));
+        when(mockGiftCertificateRepository.findById(GIFT_CERTIFICATE_1.getId())).thenReturn(Optional.of(GIFT_CERTIFICATE_1));
 
         var actualGiftCertificate = giftCertificateService.findById(GIFT_CERTIFICATE_1.getId());
 
@@ -50,7 +42,7 @@ class GiftCertificateServiceTest {
 
     @Test
     void findAllGiftCertificates_ShouldReturnExpectedGiftCertificateList() throws GiftCertificateNotFoundException {
-        when(giftCertificateBaseRepository.findAll()).thenReturn(GIFT_CERTIFICATE_LIST);
+        when(mockGiftCertificateRepository.findAll()).thenReturn(GIFT_CERTIFICATE_LIST);
 
         var actualGiftCertificates = giftCertificateService.findAll();
 

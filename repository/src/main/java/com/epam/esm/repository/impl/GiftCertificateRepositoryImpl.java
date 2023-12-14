@@ -24,7 +24,7 @@ import java.util.*;
 
 @Slf4j
 @Repository
-public class GiftCertificateRepositoryImpl implements BaseRepository<GiftCertificate>, GiftCertificateRepository {
+public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     private static final String INSERT_QUERY = "INSERT INTO gift_certificates (name, description, price, duration, created_date, last_updated_date) VALUES (?, ? ,?, ?, ?, ?)";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM gift_certificates WHERE id = ?";
     private static final String FIND_ALL_QUERY = "SELECT * FROM gift_certificates";

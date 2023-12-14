@@ -3,7 +3,6 @@ package com.epam.esm.repository.impl;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.TagNotFoundException;
 import com.epam.esm.exception.TagOperationException;
-import com.epam.esm.repository.BaseRepository;
 import com.epam.esm.repository.TagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 @Slf4j
 @Repository
-public class TagRepositoryImpl implements BaseRepository<Tag>, TagRepository {
+public class TagRepositoryImpl implements TagRepository {
     private static final String INSERT_QUERY = "INSERT INTO tags (name) VALUES (?)";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM tags WHERE id = ?";
     private static final String FIND_BY_NAME_QUERY = "SELECT * FROM tags WHERE name = ?";

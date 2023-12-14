@@ -7,7 +7,7 @@ import com.epam.esm.exception.GiftCertificateOperationException;
 import java.util.List;
 import java.util.Optional;
 
-public interface GiftCertificateRepository {
+public interface GiftCertificateRepository extends BaseRepository<GiftCertificate>{
 
     void update(GiftCertificate giftCertificate) throws GiftCertificateNotFoundException, GiftCertificateOperationException;
 
