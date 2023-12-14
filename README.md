@@ -17,7 +17,7 @@ TagController:
   - DELETE: /tags/{id} - deletes tag with {id}
 
 GiftCertificateController:
-  - GET : /gift-certificates -  gets all tags
+  - GET : /gift-certificates -  gets all gift certificates
   - GET: /gift-certificates/{id} -  gets single gift certificate with {id}
   - POST: /gift-certificates - creates new gift certificate
   - DELETE: /gift-certificates/{id} - deletes gift certificate with {id}
