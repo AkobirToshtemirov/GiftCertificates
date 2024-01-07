@@ -7,7 +7,6 @@ import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.service.TagService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,16 +37,12 @@ public class TagController {
     }
 
     @GetMapping("/paged")
-    public CollectionModel<EntityModel<Tag>> getTagsWithPage(@RequestParam(required = false, defaultValue = "0") int page,
+    public CollectionModel<EntityModel<Tag>> getTagsWithPage(@RequestParam(required = false, defaultValue = "1") int page,
                                                              @RequestParam(required = false, defaultValue = "10") int size) {
 
         List<Tag> tags = tagService.findAllWithPage(page, size);
-        CollectionModel<EntityModel<Tag>> collectionModel = tagModelAssembler.toCollectionModel(tags);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(tags.size()));
-
-        return collectionModel;
+        return tagModelAssembler.toCollectionModel(tags);
     }
 
     @PostMapping()
@@ -61,12 +56,4 @@ public class TagController {
         tagService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-    // to user
-
-//    @GetMapping("user/{id}")
-//    public EntityModel<Tag> getPopularTag(@PathVariable("id") Long userId) {
-//        Tag popularTag = tagService.find(userId);
-//        return tagModelAssembler.toModel(popularTag);
-//    }
 }

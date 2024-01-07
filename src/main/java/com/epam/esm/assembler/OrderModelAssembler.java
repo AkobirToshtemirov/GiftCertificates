@@ -19,7 +19,7 @@ public class OrderModelAssembler implements RepresentationModelAssembler<Order, 
     @Override
     public EntityModel<Order> toModel(Order entity) {
         Link selfLink = linkTo(methodOn(OrderController.class).getOrder(entity.getId())).withSelfRel();
-        Link ordersLink = linkTo(methodOn(OrderController.class).getOrdersWithPage(0, 10)).withRel("orders");
+        Link ordersLink = linkTo(methodOn(OrderController.class).getOrdersWithPage(1, 10)).withRel("orders");
         return EntityModel.of(entity, selfLink, ordersLink);
     }
 
@@ -27,7 +27,7 @@ public class OrderModelAssembler implements RepresentationModelAssembler<Order, 
     public CollectionModel<EntityModel<Order>> toCollectionModel(Iterable<? extends Order> entities) {
         List<EntityModel<Order>> entityModels = new ArrayList<>();
         entities.forEach(order -> entityModels.add(toModel(order)));
-        Link ordersLink = linkTo(methodOn(OrderController.class).getOrdersWithPage(0, 10)).withSelfRel();
+        Link ordersLink = linkTo(methodOn(OrderController.class).getOrdersWithPage(1, 10)).withSelfRel();
         return CollectionModel.of(entityModels, ordersLink);
     }
 

@@ -3,16 +3,17 @@ package com.epam.esm.controller;
 import com.epam.esm.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.ValidationException;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/api/gift-certificates", produces = "application/json", consumes = "application/json")
@@ -38,15 +39,11 @@ public class GiftCertificateController {
     }
 
     @GetMapping("/paged")
-    public CollectionModel<EntityModel<GiftCertificate>> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "0") int page,
+    public CollectionModel<EntityModel<GiftCertificate>> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "1") int page,
                                                                                      @RequestParam(required = false, defaultValue = "10") int size) {
         List<GiftCertificate> giftCertificates = giftCertificateService.findAllWithPage(page, size);
-        CollectionModel<EntityModel<GiftCertificate>> collectionModel = giftCertificateModelAssembler.toCollectionModel(giftCertificates);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(giftCertificates.size()));
-
-        return collectionModel;
+        return giftCertificateModelAssembler.toCollectionModel(giftCertificates);
     }
 
     @PostMapping()
@@ -69,7 +66,7 @@ public class GiftCertificateController {
 
     @GetMapping("/search")
     public CollectionModel<EntityModel<GiftCertificate>> findCertificatesByCriteria(
-            @RequestParam(required = false) String[] tagNames,
+            @RequestParam(value = "tag", required = false) List<String> tagNames,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "false") boolean ascending
@@ -79,13 +76,21 @@ public class GiftCertificateController {
     }
 
     @PatchMapping("/{id}/duration")
-    public EntityModel<GiftCertificate> updateGiftCertificateDuration(@PathVariable Long id, @RequestBody Double duration) {
+    public EntityModel<GiftCertificate> updateGiftCertificateDuration(@PathVariable Long id, @RequestBody Map<String, Double> requestBody) {
+        if (!requestBody.containsKey("duration"))
+            throw new ValidationException("Request body should contain 'duration' field.");
+
+        Double duration = requestBody.get("duration");
         GiftCertificate giftCertificate = giftCertificateService.updateGiftCertificateDuration(id, duration);
         return giftCertificateModelAssembler.toModel(giftCertificate);
     }
 
     @PatchMapping("/{id}/price")
-    public EntityModel<GiftCertificate> updateGiftCertificatePrice(@PathVariable Long id, @RequestBody BigDecimal price) {
+    public EntityModel<GiftCertificate> updateGiftCertificatePrice(@PathVariable Long id, @RequestBody Map<String, BigDecimal> requestBody) {
+        if (!requestBody.containsKey("price"))
+            throw new ValidationException("Request body should contain 'price' field.");
+
+        BigDecimal price = requestBody.get("price");
         GiftCertificate giftCertificate = giftCertificateService.updateGiftCertificatePrice(id, price);
         return giftCertificateModelAssembler.toModel(giftCertificate);
     }

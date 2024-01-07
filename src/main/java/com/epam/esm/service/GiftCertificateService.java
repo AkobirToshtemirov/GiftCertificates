@@ -8,7 +8,7 @@ import java.util.List;
 public interface GiftCertificateService extends BaseService<GiftCertificate> {
     GiftCertificate update(Long id, GiftCertificate updatedGiftCertificate);
 
-    List<GiftCertificate> findCertificatesByCriteria(String[] tagNames, String search, String sortBy, boolean ascending);
+    List<GiftCertificate> findCertificatesByCriteria(List<String> tagNames, String search, String sortBy, boolean ascending);
 
     GiftCertificate updateGiftCertificateDuration(Long id, Double duration);
 

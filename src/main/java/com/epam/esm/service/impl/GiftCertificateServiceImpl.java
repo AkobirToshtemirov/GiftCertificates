@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public GiftCertificate create(GiftCertificate entity) {
+        entity.setCreatedDate(LocalDateTime.now());
         return giftCertificateRepository.save(entity);
     }
 
@@ -56,12 +58,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
             throw new NotFoundException("Gift Certificate not found with id: " + id);
 
         updatedGiftCertificate.setId(id);
+        updatedGiftCertificate.setLastUpdatedDate(LocalDateTime.now());
 
-        return giftCertificateRepository.save(updatedGiftCertificate);
+        return giftCertificateRepository.update(updatedGiftCertificate);
     }
 
     @Override
-    public List<GiftCertificate> findCertificatesByCriteria(String[] tagNames, String search, String sortBy, boolean ascending) {
+    public List<GiftCertificate> findCertificatesByCriteria(List<String> tagNames, String search, String sortBy, boolean ascending) {
         return giftCertificateRepository.findCertificatesByCriteria(tagNames, search, sortBy, ascending);
     }
 
@@ -71,6 +74,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 .orElseThrow(() -> new NotFoundException("Gift Certificate not found with id: " + id));
 
         giftCertificate.setDuration(duration);
+        giftCertificate.setLastUpdatedDate(LocalDateTime.now());
 
         return giftCertificateRepository.save(giftCertificate);
     }
@@ -81,6 +85,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 .orElseThrow(() -> new NotFoundException("Gift Certificate not found with id: " + id));
 
         giftCertificate.setPrice(price);
+        giftCertificate.setLastUpdatedDate(LocalDateTime.now());
 
         return giftCertificateRepository.save(giftCertificate);
     }

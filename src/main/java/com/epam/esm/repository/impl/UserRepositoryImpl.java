@@ -10,15 +10,20 @@ import com.epam.esm.repository.UserRepository;
 import com.epam.esm.validator.EntityValidator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Transactional
 public class UserRepositoryImpl implements UserRepository {
     @PersistenceContext
     private EntityManager entityManager;
@@ -75,29 +80,34 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Tag findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tag> query = cb.createQuery(Tag.class);
-        Root<User> userRoot = query.from(User.class);
+        CriteriaQuery<Tuple> criteria = cb.createTupleQuery();
 
-        Subquery<BigDecimal> subquery = query.subquery(BigDecimal.class);
-        Root<Order> orderRoot = subquery.from(Order.class);
-        Join<Order, GiftCertificate> certificateJoin = orderRoot.join("giftCertificate");
+        Root<Order> orderRoot = criteria.from(Order.class);
+        Join<Order, GiftCertificate> giftCertificateJoin = orderRoot.join("giftCertificate");
+        Join<GiftCertificate, Tag> tagJoin = giftCertificateJoin.join("tags");
 
-        Predicate userPredicate = cb.equal(userRoot.get("id"), userId);
-        Predicate userOrderPredicate = cb.equal(orderRoot.get("user"), userRoot);
+        criteria.multiselect(
+                tagJoin.get("id").alias("tagId"),
+                tagJoin.get("name").alias("tagName"),
+                cb.sum(orderRoot.get("price")).alias("totalPrice")
+        );
 
-        Expression<BigDecimal> sumOfOrderCost = cb.sum(certificateJoin.get("price"));
-        subquery.select(sumOfOrderCost)
-                .where(userOrderPredicate)
-                .groupBy(orderRoot.get("user"));
+        criteria.where(
+                cb.equal(orderRoot.get("user").get("id"), userId)
+        );
+        criteria.groupBy(tagJoin.get("id"), tagJoin.get("name"));
+        criteria.orderBy(cb.desc(cb.sum(orderRoot.get("price"))));
 
-        query.select(userRoot.get("orderList").get("giftCertificate").get("tags"))
-                .where(cb.and(userPredicate, cb.equal(orderRoot.get("price"), subquery)))
-                .orderBy(cb.desc(sumOfOrderCost));
+        TypedQuery<Tuple> query = entityManager.createQuery(criteria);
+        List<Tuple> resultList = query.getResultList();
 
-        List<Tag> tags = entityManager.createQuery(query)
-                .setMaxResults(1)
-                .getResultList();
-
-        return (tags != null && !tags.isEmpty()) ? tags.get(0) : null;
+        if (!resultList.isEmpty()) {
+            Tuple result = resultList.get(0);
+            Long tagId = result.get("tagId", Long.class);
+            String tagName = result.get("tagName", String.class);
+            return new Tag(tagId, tagName);
+        } else {
+            return null;
+        }
     }
 }

@@ -19,7 +19,7 @@ public class GiftCertificateModelAssembler implements RepresentationModelAssembl
     @Override
     public EntityModel<GiftCertificate> toModel(GiftCertificate entity) {
         Link selfLink = linkTo(methodOn(GiftCertificateController.class).getGiftCertificate(entity.getId())).withSelfRel();
-        Link giftCertificatesLink = linkTo(methodOn(GiftCertificateController.class).getGiftCertificatesWithPage(0, 10)).withRel("giftCertificates");
+        Link giftCertificatesLink = linkTo(methodOn(GiftCertificateController.class).getGiftCertificatesWithPage(1, 10)).withRel("giftCertificates");
         return EntityModel.of(entity, selfLink, giftCertificatesLink);
     }
 
@@ -27,7 +27,7 @@ public class GiftCertificateModelAssembler implements RepresentationModelAssembl
     public CollectionModel<EntityModel<GiftCertificate>> toCollectionModel(Iterable<? extends GiftCertificate> entities) {
         List<EntityModel<GiftCertificate>> entityModels = new ArrayList<>();
         entities.forEach(giftCertificate -> entityModels.add(toModel(giftCertificate)));
-        Link giftCertificatesLink = linkTo(methodOn(GiftCertificateController.class).getGiftCertificatesWithPage(0, 10)).withSelfRel();
+        Link giftCertificatesLink = linkTo(methodOn(GiftCertificateController.class).getGiftCertificatesWithPage(1, 10)).withSelfRel();
         return CollectionModel.of(entityModels, giftCertificatesLink);
     }
 

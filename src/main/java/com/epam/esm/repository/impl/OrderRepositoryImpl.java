@@ -12,11 +12,13 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Transactional
 public class OrderRepositoryImpl implements OrderRepository {
     @PersistenceContext
     private EntityManager entityManager;
@@ -46,7 +48,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Order> findAllWithPage(int page, int size) throws ValidationException{
+    public List<Order> findAllWithPage(int page, int size) throws ValidationException {
         if (page <= 0 || size <= 0)
             throw new ValidationException("Page number and page size must be positive");
 
@@ -73,7 +75,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Order> findOrdersInfoByUserIdWithPage(Long userId, int page, int size) {
-        if (page < 0 || size <= 0)
+        if (page <= 0 || size <= 0)
             throw new ValidationException("Page number and page size must be positive");
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();

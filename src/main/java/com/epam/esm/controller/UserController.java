@@ -7,7 +7,6 @@ import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.service.UserService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,15 +37,11 @@ public class UserController {
     }
 
     @GetMapping("/paged")
-    public CollectionModel<EntityModel<User>> getUsersWithPage(@RequestParam(required = false, defaultValue = "0") int page,
+    public CollectionModel<EntityModel<User>> getUsersWithPage(@RequestParam(required = false, defaultValue = "1") int page,
                                                                @RequestParam(required = false, defaultValue = "10") int size) {
         List<User> users = userService.findAllWithPage(page, size);
-        CollectionModel<EntityModel<User>> collectionModel = userModelAssembler.toCollectionModel(users);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(users.size()));
-
-        return collectionModel;
+        return userModelAssembler.toCollectionModel(users, page, size);
     }
 
     @PostMapping()

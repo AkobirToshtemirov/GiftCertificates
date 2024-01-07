@@ -19,7 +19,7 @@ public class TagModelAssembler implements RepresentationModelAssembler<Tag, Enti
     @Override
     public EntityModel<Tag> toModel(Tag entity) {
         Link selfLink = linkTo(methodOn(TagController.class).getTag(entity.getId())).withSelfRel();
-        Link tagsLink = linkTo(methodOn(TagController.class).getTagsWithPage(0, 10)).withRel("tags");
+        Link tagsLink = linkTo(methodOn(TagController.class).getTagsWithPage(1, 10)).withRel("tags");
         return EntityModel.of(entity, selfLink, tagsLink);
     }
 
@@ -27,7 +27,7 @@ public class TagModelAssembler implements RepresentationModelAssembler<Tag, Enti
     public CollectionModel<EntityModel<Tag>> toCollectionModel(Iterable<? extends Tag> entities) {
         List<EntityModel<Tag>> entityModels = new ArrayList<>();
         entities.forEach(tag -> entityModels.add(toModel(tag)));
-        Link tagsLink = linkTo(methodOn(TagController.class).getTagsWithPage(0, 10)).withSelfRel();
+        Link tagsLink = linkTo(methodOn(TagController.class).getTagsWithPage(1, 10)).withSelfRel();
         return CollectionModel.of(entityModels, tagsLink);
     }
 

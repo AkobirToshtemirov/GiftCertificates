@@ -7,7 +7,6 @@ import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.service.OrderService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,15 +35,11 @@ public class OrderController {
     }
 
     @GetMapping("/paged")
-    public CollectionModel<EntityModel<Order>> getOrdersWithPage(@RequestParam(required = false, defaultValue = "0") int page,
+    public CollectionModel<EntityModel<Order>> getOrdersWithPage(@RequestParam(required = false, defaultValue = "1") int page,
                                                                  @RequestParam(required = false, defaultValue = "10") int size) {
         List<Order> orders = orderService.findAllWithPage(page, size);
-        CollectionModel<EntityModel<Order>> collectionModel = orderModelAssembler.toCollectionModel(orders);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Total-Count", String.valueOf(orders.size()));
-
-        return collectionModel;
+        return orderModelAssembler.toCollectionModel(orders);
     }
 
     @PostMapping
@@ -55,7 +50,7 @@ public class OrderController {
 
     @GetMapping("/{userId}/user-orders")
     public CollectionModel<EntityModel<Order>> getOrdersByUserIdWithPage(@PathVariable Long userId,
-                                                                         @RequestParam(required = false, defaultValue = "0") int page,
+                                                                         @RequestParam(required = false, defaultValue = "1") int page,
                                                                          @RequestParam(required = false, defaultValue = "10") int size) {
         List<Order> userOrders = orderService.findOrdersInfoByUserIdWithPage(userId, page, size);
         return orderModelAssembler.toCollectionModel(userOrders);

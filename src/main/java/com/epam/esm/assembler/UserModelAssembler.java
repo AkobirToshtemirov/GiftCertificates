@@ -20,16 +20,33 @@ public class UserModelAssembler implements RepresentationModelAssembler<User, En
     @Override
     public EntityModel<User> toModel(User entity) {
         Link selfLink = linkTo(methodOn(UserController.class).getUser(entity.getId())).withSelfRel();
-        Link usersLink = linkTo(methodOn(UserController.class).getUsersWithPage(0, 10)).withRel("users");
+
+        linkTo(methodOn(UserController.class).findMostUsedTagOfUserWithHighestOrderCost(entity.getId()));
+
+        Link usersLink = linkTo(methodOn(UserController.class).getUsersWithPage(1, 10)).withRel("users");
+
         return EntityModel.of(entity, selfLink, usersLink);
     }
 
-    @Override
-    public CollectionModel<EntityModel<User>> toCollectionModel(Iterable<? extends User> entities) {
+    public CollectionModel<EntityModel<User>> toCollectionModel(List<User> entities, int page, int size) {
         List<EntityModel<User>> entityModels = new ArrayList<>();
         entities.forEach(user -> entityModels.add(toModel(user)));
-        Link usersLink = linkTo(methodOn(UserController.class).getUsersWithPage(0, 10)).withSelfRel();
-        return CollectionModel.of(entityModels, usersLink);
+
+        Link selfLink = linkTo(methodOn(UserController.class).getUsersWithPage(page, size)).withSelfRel();
+
+        CollectionModel<EntityModel<User>> collectionModel = CollectionModel.of(entityModels, selfLink);
+
+        if (page > 1) {
+            Link prevLink = linkTo(methodOn(UserController.class).getUsersWithPage(page - 1, size)).withRel("prev");
+            collectionModel.add(prevLink);
+        }
+
+        if (entities.size() >= size) {
+            Link nextLink = linkTo(methodOn(UserController.class).getUsersWithPage(page + 1, size)).withRel("next");
+            collectionModel.add(nextLink);
+        }
+
+        return collectionModel;
     }
 
     public CollectionModel<EntityModel<User>> toCollectionModelNoPage(Iterable<? extends User> entities) {

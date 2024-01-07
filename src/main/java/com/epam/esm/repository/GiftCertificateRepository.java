@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface GiftCertificateRepository extends BaseRepository<GiftCertificate> {
 
-    void update(GiftCertificate giftCertificate) throws NotFoundException, OperationException;
+    GiftCertificate update(GiftCertificate giftCertificate) throws NotFoundException, OperationException;
 
-    List<GiftCertificate> findCertificatesByCriteria(String[] tagNames, String search, String sortBy, boolean ascending) throws OperationException;
+    List<GiftCertificate> findCertificatesByCriteria(List<String> tagNames, String search, String sortBy, boolean ascending) throws OperationException;
 }
