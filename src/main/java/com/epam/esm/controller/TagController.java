@@ -1,12 +1,12 @@
 package com.epam.esm.controller;
 
 
-import com.epam.esm.assembler.TagModelAssembler;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.model.TagModel;
+import com.epam.esm.model.assembler.TagModelAssembler;
 import com.epam.esm.service.TagService;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,28 +25,28 @@ public class TagController {
     }
 
     @GetMapping(value = "/{id}")
-    public EntityModel<Tag> getTag(@PathVariable("id") Long id) {
+    public TagModel getTag(@PathVariable("id") Long id) {
         return tagModelAssembler.toModel(tagService.findById(id)
                 .orElseThrow(() -> new NotFoundException("Tag not found with id: " + id)));
     }
 
     @GetMapping
-    public CollectionModel<EntityModel<Tag>> getTags() {
+    public CollectionModel<TagModel> getTags() {
         List<Tag> tags = tagService.findAll();
         return tagModelAssembler.toCollectionModelNoPage(tags);
     }
 
     @GetMapping("/paged")
-    public CollectionModel<EntityModel<Tag>> getTagsWithPage(@RequestParam(required = false, defaultValue = "1") int page,
-                                                             @RequestParam(required = false, defaultValue = "10") int size) {
+    public CollectionModel<TagModel> getTagsWithPage(@RequestParam(required = false, defaultValue = "1") int page,
+                                                     @RequestParam(required = false, defaultValue = "10") int size) {
 
         List<Tag> tags = tagService.findAllWithPage(page, size);
 
-        return tagModelAssembler.toCollectionModel(tags);
+        return tagModelAssembler.toCollectionModel(tags, page, size);
     }
 
     @PostMapping()
-    public EntityModel<Tag> saveTag(@RequestBody Tag tag) {
+    public TagModel saveTag(@RequestBody Tag tag) {
         Tag savedTag = tagService.create(tag);
         return tagModelAssembler.toModel(savedTag);
     }

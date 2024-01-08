@@ -1,12 +1,12 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.exception.ValidationException;
+import com.epam.esm.model.GiftCertificateModel;
+import com.epam.esm.model.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.service.GiftCertificateService;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,27 +27,27 @@ public class GiftCertificateController {
     }
 
     @GetMapping(value = "/{id}")
-    public EntityModel<GiftCertificate> getGiftCertificate(@PathVariable("id") Long id) {
+    public GiftCertificateModel getGiftCertificate(@PathVariable("id") Long id) {
         return giftCertificateModelAssembler.toModel(giftCertificateService.findById(id)
                 .orElseThrow(() -> new NotFoundException("Gift Certificate not found with id: " + id)));
     }
 
     @GetMapping
-    public CollectionModel<EntityModel<GiftCertificate>> getGiftCertificates() {
+    public CollectionModel<GiftCertificateModel> getGiftCertificates() {
         List<GiftCertificate> giftCertificates = giftCertificateService.findAll();
         return giftCertificateModelAssembler.toCollectionModelNoPage(giftCertificates);
     }
 
     @GetMapping("/paged")
-    public CollectionModel<EntityModel<GiftCertificate>> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "1") int page,
-                                                                                     @RequestParam(required = false, defaultValue = "10") int size) {
+    public CollectionModel<GiftCertificateModel> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "1") int page,
+                                                                             @RequestParam(required = false, defaultValue = "10") int size) {
         List<GiftCertificate> giftCertificates = giftCertificateService.findAllWithPage(page, size);
 
-        return giftCertificateModelAssembler.toCollectionModel(giftCertificates);
+        return giftCertificateModelAssembler.toCollectionModel(giftCertificates, page, size);
     }
 
     @PostMapping()
-    public EntityModel<GiftCertificate> saveGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
+    public GiftCertificateModel saveGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
         GiftCertificate savedGiftCertificate = giftCertificateService.create(giftCertificate);
         return giftCertificateModelAssembler.toModel(savedGiftCertificate);
     }
@@ -59,13 +59,13 @@ public class GiftCertificateController {
     }
 
     @PutMapping("/{id}")
-    public EntityModel<GiftCertificate> updateGiftCertificate(@PathVariable Long id, @RequestBody GiftCertificate updatedGiftCertificate) {
+    public GiftCertificateModel updateGiftCertificate(@PathVariable Long id, @RequestBody GiftCertificate updatedGiftCertificate) {
         GiftCertificate giftCertificate = giftCertificateService.update(id, updatedGiftCertificate);
         return giftCertificateModelAssembler.toModel(giftCertificate);
     }
 
     @GetMapping("/search")
-    public CollectionModel<EntityModel<GiftCertificate>> findCertificatesByCriteria(
+    public CollectionModel<GiftCertificateModel> findCertificatesByCriteria(
             @RequestParam(value = "tag", required = false) List<String> tagNames,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String sortBy,
@@ -76,7 +76,7 @@ public class GiftCertificateController {
     }
 
     @PatchMapping("/{id}/duration")
-    public EntityModel<GiftCertificate> updateGiftCertificateDuration(@PathVariable Long id, @RequestBody Map<String, Double> requestBody) {
+    public GiftCertificateModel updateGiftCertificateDuration(@PathVariable Long id, @RequestBody Map<String, Double> requestBody) {
         if (!requestBody.containsKey("duration"))
             throw new ValidationException("Request body should contain 'duration' field.");
 
@@ -86,7 +86,7 @@ public class GiftCertificateController {
     }
 
     @PatchMapping("/{id}/price")
-    public EntityModel<GiftCertificate> updateGiftCertificatePrice(@PathVariable Long id, @RequestBody Map<String, BigDecimal> requestBody) {
+    public GiftCertificateModel updateGiftCertificatePrice(@PathVariable Long id, @RequestBody Map<String, BigDecimal> requestBody) {
         if (!requestBody.containsKey("price"))
             throw new ValidationException("Request body should contain 'price' field.");
 

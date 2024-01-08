@@ -8,6 +8,7 @@ import com.epam.esm.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User entity) {
+        entity.setOrderList(Collections.emptyList());
         return userRepository.save(entity);
     }
 
