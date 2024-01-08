@@ -1,6 +1,7 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.repository.GiftCertificateRepository;
 import com.epam.esm.service.GiftCertificateService;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +27,13 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public GiftCertificate create(GiftCertificate entity) {
         entity.setCreatedDate(LocalDateTime.now());
+        List<Tag> tags = entity.getTags();
+        for (Tag tag : tags) {
+            if (tag.getGiftCertificates() == null) {
+                tag.setGiftCertificates(new HashSet<>());
+            }
+            tag.getGiftCertificates().add(entity);
+        }
         return giftCertificateRepository.save(entity);
     }
 

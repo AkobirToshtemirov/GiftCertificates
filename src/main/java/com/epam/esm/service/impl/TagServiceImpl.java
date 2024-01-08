@@ -4,12 +4,14 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.service.TagService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
 

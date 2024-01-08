@@ -5,12 +5,14 @@ import com.epam.esm.entity.User;
 import com.epam.esm.exception.ValidationException;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
