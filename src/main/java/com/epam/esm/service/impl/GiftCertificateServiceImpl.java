@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -28,12 +29,16 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public GiftCertificate create(GiftCertificate entity) {
         entity.setCreatedDate(LocalDateTime.now());
         List<Tag> tags = entity.getTags();
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
         for (Tag tag : tags) {
             if (tag.getGiftCertificates() == null) {
                 tag.setGiftCertificates(new HashSet<>());
             }
             tag.getGiftCertificates().add(entity);
         }
+        entity.setTags(tags);
         return giftCertificateRepository.save(entity);
     }
 
