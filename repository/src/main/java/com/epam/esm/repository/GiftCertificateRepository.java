@@ -1,15 +1,14 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.exception.GiftCertificateNotFoundException;
-import com.epam.esm.exception.GiftCertificateOperationException;
+import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.OperationException;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface GiftCertificateRepository extends BaseRepository<GiftCertificate>{
+public interface GiftCertificateRepository extends BaseRepository<GiftCertificate> {
 
-    void update(GiftCertificate giftCertificate) throws GiftCertificateNotFoundException, GiftCertificateOperationException;
+    GiftCertificate update(GiftCertificate giftCertificate) throws NotFoundException, OperationException;
 
-    List<GiftCertificate> findCertificatesByCriteria(String tagName, String search, String sortBy, boolean ascending) throws GiftCertificateOperationException;
+    List<GiftCertificate> findCertificatesByCriteria(List<String> tagNames, String search, String sortBy, boolean ascending) throws OperationException;
 }

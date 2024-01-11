@@ -1,10 +1,19 @@
 package com.epam.esm.dto;
 
-import org.springframework.http.HttpStatus;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-public record ErrorResponseDTO(
-        String errorMessage,
-        int errorCode,
-        HttpStatus httpStatus
-) {
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@Builder
+public class ErrorResponseDTO {
+    String errorPath;
+    Integer errorCode;
+    Object errorBody;
+
+    @Builder.Default
+    LocalDateTime timestamp = LocalDateTime.now();
 }

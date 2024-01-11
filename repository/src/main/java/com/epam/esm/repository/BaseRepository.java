@@ -10,5 +10,7 @@ public interface BaseRepository<T> {
 
     List<T> findAll();
 
+    List<T> findAllWithPage(int page, int size);
+
     void delete(Long id);
 }

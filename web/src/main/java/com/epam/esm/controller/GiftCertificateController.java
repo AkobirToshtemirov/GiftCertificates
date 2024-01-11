@@ -1,118 +1,97 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.service.BaseService;
+import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.ValidationException;
+import com.epam.esm.model.GiftCertificateModel;
+import com.epam.esm.model.assembler.GiftCertificateModelAssembler;
 import com.epam.esm.service.GiftCertificateService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
-/**
- * GiftCertificateController handles HTTP requests related to gift certificates, providing endpoints for creating,
- * retrieving, updating, and deleting gift certificates, as well as searching for gift certificates based on criteria.
- * <p>
- * This controller communicates with the {@link com.epam.esm.service.GiftCertificateService} for business logic
- * related to gift certificates.
- */
 @RestController
-@RequestMapping(
-        path = "/gift-certificates",
-        consumes = {"application/json"},
-        produces = {"application/json"}
-)
+@RequestMapping(value = "/api/gift-certificates", produces = "application/json", consumes = "application/json")
 public class GiftCertificateController {
     private final GiftCertificateService giftCertificateService;
-    private final BaseService<GiftCertificate> giftCertificateBaseService;
+    private final GiftCertificateModelAssembler giftCertificateModelAssembler;
 
-    @Autowired
-    public GiftCertificateController(GiftCertificateService giftCertificateService, BaseService<GiftCertificate> giftCertificateBaseService) {
+    public GiftCertificateController(GiftCertificateService giftCertificateService, GiftCertificateModelAssembler giftCertificateModelAssembler) {
         this.giftCertificateService = giftCertificateService;
-        this.giftCertificateBaseService = giftCertificateBaseService;
+        this.giftCertificateModelAssembler = giftCertificateModelAssembler;
     }
 
-    /**
-     * Creates a new gift certificate.
-     *
-     * @param giftCertificate The gift certificate to be created.
-     * @return ResponseEntity containing the created gift certificate and HTTP status code 201 (Created).
-     */
-    @PostMapping
-    public ResponseEntity<GiftCertificate> createGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
-        GiftCertificate createdCertificate = giftCertificateBaseService.create(giftCertificate);
-        return new ResponseEntity<>(createdCertificate, HttpStatus.CREATED);
+    @GetMapping(value = "/{id}")
+    public GiftCertificateModel getGiftCertificate(@PathVariable("id") Long id) {
+        return giftCertificateModelAssembler.toModel(giftCertificateService.findById(id)
+                .orElseThrow(() -> new NotFoundException("Gift Certificate not found with id: " + id)));
     }
 
-    /**
-     * Retrieves a gift certificate by its ID.
-     *
-     * @param id The ID of the gift certificate to be retrieved.
-     * @return ResponseEntity containing the retrieved gift certificate and HTTP status code 200 (OK).
-     */
-    @GetMapping("/{id}")
-    public ResponseEntity<GiftCertificate> findGiftCertificateById(@PathVariable Long id) {
-        GiftCertificate certificate = giftCertificateBaseService.findById(id);
-        return ResponseEntity.ok(certificate);
-    }
-
-    /**
-     * Retrieves all gift certificates.
-     *
-     * @return ResponseEntity containing the list of all gift certificates and HTTP status code 200 (OK).
-     */
     @GetMapping
-    public ResponseEntity<List<GiftCertificate>> findAllGiftCertificates() {
-        List<GiftCertificate> certificates = giftCertificateBaseService.findAll();
-        return ResponseEntity.ok(certificates);
+    public CollectionModel<GiftCertificateModel> getGiftCertificates() {
+        List<GiftCertificate> giftCertificates = giftCertificateService.findAll();
+        return giftCertificateModelAssembler.toCollectionModelNoPage(giftCertificates);
     }
 
-    /**
-     * Updates a gift certificate by its ID.
-     *
-     * @param id              The ID of the gift certificate to be updated.
-     * @param giftCertificate The updated gift certificate data.
-     * @return ResponseEntity containing the updated gift certificate and HTTP status code 200 (OK).
-     */
-    @PatchMapping("/{id}")
-    public ResponseEntity<GiftCertificate> updateGiftCertificate(
-            @PathVariable Long id,
-            @RequestBody GiftCertificate giftCertificate) {
-        GiftCertificate updatedCertificate = giftCertificateService.update(id, giftCertificate);
-        return ResponseEntity.ok(updatedCertificate);
+    @GetMapping("/paged")
+    public CollectionModel<GiftCertificateModel> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "1") int page,
+                                                                             @RequestParam(required = false, defaultValue = "10") int size) {
+        List<GiftCertificate> giftCertificates = giftCertificateService.findAllWithPage(page, size);
+
+        return giftCertificateModelAssembler.toCollectionModel(giftCertificates, page, size);
     }
 
-    /**
-     * Deletes a gift certificate by its ID.
-     *
-     * @param id The ID of the gift certificate to be deleted.
-     * @return ResponseEntity with HTTP status code 204 (No Content) indicating successful deletion.
-     */
+    @PostMapping()
+    public GiftCertificateModel saveGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
+        GiftCertificate savedGiftCertificate = giftCertificateService.create(giftCertificate);
+        return giftCertificateModelAssembler.toModel(savedGiftCertificate);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGiftCertificate(@PathVariable Long id) {
-        giftCertificateBaseService.delete(id);
+        giftCertificateService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    /**
-     * Searches for gift certificates based on criteria.
-     *
-     * @param tagName   The tag name to filter gift certificates.
-     * @param search    The search term to filter gift certificates.
-     * @param sortBy    The field by which to sort the gift certificates.
-     * @param ascending A boolean indicating whether to sort in ascending order (default is descending).
-     * @return ResponseEntity containing the list of gift certificates matching the criteria and HTTP status code 200 (OK).
-     */
+    @PutMapping("/{id}")
+    public GiftCertificateModel updateGiftCertificate(@PathVariable Long id, @RequestBody GiftCertificate updatedGiftCertificate) {
+        GiftCertificate giftCertificate = giftCertificateService.update(id, updatedGiftCertificate);
+        return giftCertificateModelAssembler.toModel(giftCertificate);
+    }
+
     @GetMapping("/search")
-    public ResponseEntity<List<GiftCertificate>> findCertificatesByCriteria(
-            @RequestParam(required = false) String tagName,
+    public CollectionModel<GiftCertificateModel> findCertificatesByCriteria(
+            @RequestParam(value = "tag", required = false) List<String> tagNames,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(defaultValue = "false") boolean ascending) {
+            @RequestParam(required = false, defaultValue = "false") boolean ascending
+    ) {
+        List<GiftCertificate> giftCertificates = giftCertificateService.findCertificatesByCriteria(tagNames, search, sortBy, ascending);
+        return giftCertificateModelAssembler.toCollectionModelNoPage(giftCertificates);
+    }
 
-        List<GiftCertificate> certificates = giftCertificateService.findCertificatesByCriteria(tagName, search, sortBy, ascending);
+    @PatchMapping("/{id}/duration")
+    public GiftCertificateModel updateGiftCertificateDuration(@PathVariable Long id, @RequestBody Map<String, Double> requestBody) {
+        if (!requestBody.containsKey("duration"))
+            throw new ValidationException("Request body should contain 'duration' field.");
 
-        return ResponseEntity.ok(certificates);
+        Double duration = requestBody.get("duration");
+        GiftCertificate giftCertificate = giftCertificateService.updateGiftCertificateDuration(id, duration);
+        return giftCertificateModelAssembler.toModel(giftCertificate);
+    }
+
+    @PatchMapping("/{id}/price")
+    public GiftCertificateModel updateGiftCertificatePrice(@PathVariable Long id, @RequestBody Map<String, BigDecimal> requestBody) {
+        if (!requestBody.containsKey("price"))
+            throw new ValidationException("Request body should contain 'price' field.");
+
+        BigDecimal price = requestBody.get("price");
+        GiftCertificate giftCertificate = giftCertificateService.updateGiftCertificatePrice(id, price);
+        return giftCertificateModelAssembler.toModel(giftCertificate);
     }
 }
