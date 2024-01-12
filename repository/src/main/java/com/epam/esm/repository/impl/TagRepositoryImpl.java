@@ -1,5 +1,7 @@
 package com.epam.esm.repository.impl;
 
+import com.epam.esm.entity.GiftCertificate;
+import com.epam.esm.entity.Order;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.exception.ValidationException;
@@ -7,9 +9,11 @@ import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.EntityValidator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
@@ -78,5 +82,39 @@ public class TagRepositoryImpl implements TagRepository {
                 .getResultList()
                 .stream()
                 .findFirst();
+    }
+
+    @Override
+    public Tag findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> criteria = cb.createTupleQuery();
+
+        Root<Order> orderRoot = criteria.from(Order.class);
+        Join<Order, GiftCertificate> giftCertificateJoin = orderRoot.join("giftCertificate");
+        Join<GiftCertificate, Tag> tagJoin = giftCertificateJoin.join("tags");
+
+        criteria.multiselect(
+                tagJoin.get("id").alias("tagId"),
+                tagJoin.get("name").alias("tagName"),
+                cb.sum(orderRoot.get("price")).alias("totalPrice")
+        );
+
+        criteria.where(
+                cb.equal(orderRoot.get("user").get("id"), userId)
+        );
+        criteria.groupBy(tagJoin.get("id"), tagJoin.get("name"));
+        criteria.orderBy(cb.desc(cb.sum(orderRoot.get("price"))));
+
+        TypedQuery<Tuple> query = entityManager.createQuery(criteria);
+        List<Tuple> resultList = query.getResultList();
+
+        if (!resultList.isEmpty()) {
+            Tuple result = resultList.get(0);
+            Long tagId = result.get("tagId", Long.class);
+            String tagName = result.get("tagName", String.class);
+            return new Tag(tagId, tagName);
+        } else {
+            return null;
+        }
     }
 }

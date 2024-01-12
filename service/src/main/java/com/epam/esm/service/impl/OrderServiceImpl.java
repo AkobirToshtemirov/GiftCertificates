@@ -30,7 +30,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order create(Long userId, Long giftCertificateId) throws NotFoundException {
+    public Order create(Long userId, Long giftCertificateId) {
         User user = userService.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User is not found with id: " + userId));
 

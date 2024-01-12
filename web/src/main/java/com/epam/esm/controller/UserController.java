@@ -8,8 +8,6 @@ import com.epam.esm.model.UserModel;
 import com.epam.esm.model.assembler.UserModelAssembler;
 import com.epam.esm.service.UserService;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,18 +41,6 @@ public class UserController {
         List<User> users = userService.findAllWithPage(page, size);
 
         return userModelAssembler.toCollectionModel(users, page, size);
-    }
-
-    @PostMapping()
-    public UserModel saveUser(@RequestBody User user) {
-        User savedUser = userService.create(user);
-        return userModelAssembler.toModel(savedUser);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.delete(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}/most-used-tag")

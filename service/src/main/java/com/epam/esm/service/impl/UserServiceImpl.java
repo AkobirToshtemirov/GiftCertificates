@@ -4,11 +4,11 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ValidationException;
 import com.epam.esm.repository.UserRepository;
+import com.epam.esm.repository.impl.TagRepositoryImpl;
 import com.epam.esm.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,15 +16,11 @@ import java.util.Optional;
 @Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final TagRepositoryImpl tagRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, TagRepositoryImpl tagRepository) {
         this.userRepository = userRepository;
-    }
-
-    @Override
-    public User create(User entity) {
-        entity.setOrderList(Collections.emptyList());
-        return userRepository.save(entity);
+        this.tagRepository = tagRepository;
     }
 
     @Override
@@ -47,12 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(Long id) {
-        userRepository.delete(id);
-    }
-
-    @Override
     public Tag findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
-        return userRepository.findMostUsedTagOfUserWithHighestOrderCost(userId);
+        return tagRepository.findMostUsedTagOfUserWithHighestOrderCost(userId);
     }
 }
