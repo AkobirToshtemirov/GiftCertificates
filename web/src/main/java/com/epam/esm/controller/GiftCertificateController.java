@@ -38,9 +38,9 @@ public class GiftCertificateController {
         return giftCertificateModelAssembler.toCollectionModelNoPage(giftCertificates);
     }
 
-    @GetMapping("/paged")
-    public CollectionModel<GiftCertificateModel> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "1") int page,
-                                                                             @RequestParam(required = false, defaultValue = "10") int size) {
+    @GetMapping(value = "/paged")
+    public CollectionModel<GiftCertificateModel> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
+                                                                             @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
         List<GiftCertificate> giftCertificates = giftCertificateService.findAllWithPage(page, size);
 
         return giftCertificateModelAssembler.toCollectionModel(giftCertificates, page, size);
@@ -52,31 +52,31 @@ public class GiftCertificateController {
         return giftCertificateModelAssembler.toModel(savedGiftCertificate);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGiftCertificate(@PathVariable Long id) {
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteGiftCertificate(@PathVariable("id") Long id) {
         giftCertificateService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{id}")
-    public GiftCertificateModel updateGiftCertificate(@PathVariable Long id, @RequestBody GiftCertificate updatedGiftCertificate) {
+    @PutMapping(value = "/{id}")
+    public GiftCertificateModel updateGiftCertificate(@PathVariable("id") Long id, @RequestBody GiftCertificate updatedGiftCertificate) {
         GiftCertificate giftCertificate = giftCertificateService.update(id, updatedGiftCertificate);
         return giftCertificateModelAssembler.toModel(giftCertificate);
     }
 
-    @GetMapping("/search")
+    @GetMapping(value = "/search")
     public CollectionModel<GiftCertificateModel> findCertificatesByCriteria(
             @RequestParam(value = "tag", required = false) List<String> tagNames,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false, defaultValue = "false") boolean ascending
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "sortBy", required = false) String sortBy,
+            @RequestParam(value = "ascending", required = false, defaultValue = "false") boolean ascending
     ) {
         List<GiftCertificate> giftCertificates = giftCertificateService.findCertificatesByCriteria(tagNames, search, sortBy, ascending);
         return giftCertificateModelAssembler.toCollectionModelNoPage(giftCertificates);
     }
 
-    @PatchMapping("/{id}/duration")
-    public GiftCertificateModel updateGiftCertificateDuration(@PathVariable Long id, @RequestBody Map<String, Double> requestBody) {
+    @PatchMapping(value = "/{id}/duration")
+    public GiftCertificateModel updateGiftCertificateDuration(@PathVariable("id") Long id, @RequestBody Map<String, Double> requestBody) {
         if (!requestBody.containsKey("duration"))
             throw new ValidationException("Request body should contain 'duration' field.");
 
@@ -85,8 +85,8 @@ public class GiftCertificateController {
         return giftCertificateModelAssembler.toModel(giftCertificate);
     }
 
-    @PatchMapping("/{id}/price")
-    public GiftCertificateModel updateGiftCertificatePrice(@PathVariable Long id, @RequestBody Map<String, BigDecimal> requestBody) {
+    @PatchMapping(value = "/{id}/price")
+    public GiftCertificateModel updateGiftCertificatePrice(@PathVariable("id") Long id, @RequestBody Map<String, BigDecimal> requestBody) {
         if (!requestBody.containsKey("price"))
             throw new ValidationException("Request body should contain 'price' field.");
 

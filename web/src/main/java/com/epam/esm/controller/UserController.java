@@ -35,9 +35,9 @@ public class UserController {
         return userModelAssembler.toCollectionModelNoPage(users);
     }
 
-    @GetMapping("/paged")
-    public CollectionModel<UserModel> getUsersWithPage(@RequestParam(required = false, defaultValue = "1") int page,
-                                                       @RequestParam(required = false, defaultValue = "10") int size) {
+    @GetMapping(value = "/paged")
+    public CollectionModel<UserModel> getUsersWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
+                                                       @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
         List<User> users = userService.findAllWithPage(page, size);
 
         return userModelAssembler.toCollectionModel(users, page, size);

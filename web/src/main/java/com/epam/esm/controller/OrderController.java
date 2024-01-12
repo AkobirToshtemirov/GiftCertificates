@@ -34,9 +34,9 @@ public class OrderController {
         return orderModelAssembler.toCollectionModelNoPage(orders);
     }
 
-    @GetMapping("/paged")
-    public CollectionModel<OrderModel> getOrdersWithPage(@RequestParam(required = false, defaultValue = "1") int page,
-                                                         @RequestParam(required = false, defaultValue = "10") int size) {
+    @GetMapping(value = "/paged")
+    public CollectionModel<OrderModel> getOrdersWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
+                                                         @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
         List<Order> orders = orderService.findAllWithPage(page, size);
 
         return orderModelAssembler.toCollectionModel(orders, page, size);
@@ -48,16 +48,16 @@ public class OrderController {
         return orderModelAssembler.toModel(createdOrder);
     }
 
-    @GetMapping("/{userId}/user-orders")
-    public CollectionModel<OrderModel> getOrdersByUserIdWithPage(@PathVariable Long userId,
-                                                                 @RequestParam(required = false, defaultValue = "1") int page,
-                                                                 @RequestParam(required = false, defaultValue = "10") int size) {
+    @GetMapping(value = "/{userId}/user-orders")
+    public CollectionModel<OrderModel> getOrdersByUserIdWithPage(@PathVariable("userId") Long userId,
+                                                                 @RequestParam(required = false, defaultValue = "1", name = "page") int page,
+                                                                 @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
         List<Order> userOrders = orderService.findOrdersInfoByUserIdWithPage(userId, page, size);
         return orderModelAssembler.toCollectionModel(userOrders, page, size);
     }
 
-    @GetMapping("/{userId}/user-orders/all")
-    public CollectionModel<OrderModel> getAllOrdersByUserId(@PathVariable Long userId) {
+    @GetMapping(value = "/{userId}/user-orders/all")
+    public CollectionModel<OrderModel> getAllOrdersByUserId(@PathVariable("userId") Long userId) {
         List<Order> userOrders = orderService.findOrdersInfoByUserId(userId);
         return orderModelAssembler.toCollectionModelNoPage(userOrders);
     }

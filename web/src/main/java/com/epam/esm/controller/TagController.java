@@ -36,9 +36,9 @@ public class TagController {
         return tagModelAssembler.toCollectionModelNoPage(tags);
     }
 
-    @GetMapping("/paged")
-    public CollectionModel<TagModel> getTagsWithPage(@RequestParam(required = false, defaultValue = "1") int page,
-                                                     @RequestParam(required = false, defaultValue = "10") int size) {
+    @GetMapping(value = "/paged")
+    public CollectionModel<TagModel> getTagsWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
+                                                     @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
 
         List<Tag> tags = tagService.findAllWithPage(page, size);
 
@@ -51,8 +51,8 @@ public class TagController {
         return tagModelAssembler.toModel(savedTag);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTag(@PathVariable Long id) {
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteTag(@PathVariable("id") Long id) {
         tagService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
