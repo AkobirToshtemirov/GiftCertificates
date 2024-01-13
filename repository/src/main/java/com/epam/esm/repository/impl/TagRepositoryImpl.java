@@ -1,93 +1,115 @@
 package com.epam.esm.repository.impl;
 
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.TagNotFoundException;
-import com.epam.esm.exception.TagOperationException;
+import com.epam.esm.exception.NotFoundException;
+import com.epam.esm.exception.ValidationException;
 import com.epam.esm.repository.TagRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import com.epam.esm.validator.EntityValidator;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-@Slf4j
 @Repository
 public class TagRepositoryImpl implements TagRepository {
-    private static final String INSERT_QUERY = "INSERT INTO tags (name) VALUES (?)";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM tags WHERE id = ?";
-    private static final String FIND_BY_NAME_QUERY = "SELECT * FROM tags WHERE name = ?";
-    private static final String FIND_ALL_QUERY = "SELECT * FROM tags";
-    private static final String DELETE_QUERY = "DELETE FROM tags WHERE id = ?";
+    @PersistenceContext
+    private EntityManager entityManager;
 
+    private final EntityValidator entityValidator;
 
-    private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public TagRepositoryImpl(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public TagRepositoryImpl(EntityValidator entityValidator) {
+        this.entityValidator = entityValidator;
     }
 
     @Override
-    public Tag save(Tag tag) throws TagOperationException {
-        try {
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, new String[]{"id"});
-                ps.setString(1, tag.getName());
-                return ps;
-            }, keyHolder);
+    public Tag save(Tag entity) {
+        entityValidator.validateEntity(entity);
 
-            tag.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
-
-            return tag;
-        } catch (DataAccessException e) {
-            log.error("Error has occurred while saving tag", e);
-            throw new TagOperationException("Error has occurred while saving tag", e);
-        }
+        entityManager.persist(entity);
+        return entity;
     }
 
     @Override
-    public Optional<Tag> findById(Long id) throws TagNotFoundException {
-        try {
-            Tag tag = jdbcTemplate.queryForObject(FIND_BY_ID_QUERY, new BeanPropertyRowMapper<>(Tag.class), id);
-            return Optional.ofNullable(tag);
-        } catch (EmptyResultDataAccessException e) {
-            log.error("Tag not found with id: {}", id, e);
-            throw new TagNotFoundException("Tag not found with id: " + id, e);
-        }
+    public Optional<Tag> findById(Long id) {
+        return Optional.ofNullable(entityManager.find(Tag.class, id));
+    }
+
+    @Override
+    public List<Tag> findAllWithPage(int page, int size) throws ValidationException {
+        if (page <= 0 || size <= 0)
+            throw new ValidationException("Page number and page size must be positive");
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tag> query = cb.createQuery(Tag.class);
+        Root<Tag> tagRoot = query.from(Tag.class);
+
+        query.select(tagRoot);
+
+        TypedQuery<Tag> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((page - 1) * size);
+        typedQuery.setMaxResults(size);
+
+        return typedQuery.getResultList();
+    }
+
+    @Override
+    public void delete(Long id) throws NotFoundException {
+        Tag tag = entityManager.find(Tag.class, id);
+        if (tag == null)
+            throw new NotFoundException("Tag not found with id: " + id);
+        entityManager.remove(tag);
     }
 
     @Override
     public Optional<Tag> findByName(String name) {
-        try {
-            Tag tag = jdbcTemplate.queryForObject(FIND_BY_NAME_QUERY, new BeanPropertyRowMapper<>(Tag.class), name);
-            return Optional.ofNullable(tag);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
+        return entityManager.createQuery("SELECT t FROM tags t WHERE t.name = :name", Tag.class)
+                .setParameter("name", name)
+                .getResultList()
+                .stream()
+                .findFirst();
     }
 
-    @Override
-    public List<Tag> findAll() {
-        return jdbcTemplate.query(FIND_ALL_QUERY, new BeanPropertyRowMapper<>(Tag.class));
-    }
 
     @Override
-    public void delete(Long id) throws TagOperationException {
-        try {
-            jdbcTemplate.update(DELETE_QUERY, id);
-        } catch (Exception e) {
-            log.error("Error has occurred while deleting tag with id = {}", id, e);
-            throw new TagOperationException("Failed to delete tag: " + e.getMessage());
+    public List<Tag> findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
+        String nativeQuery = "SELECT t.id, t.name " +
+                "FROM orders o " +
+                "JOIN gift_certificates g ON g.id = o.gift_certificate_id " +
+                "JOIN gift_certificate_tag gct ON g.id = gct.gift_id " +
+                "JOIN tags t ON t.id = gct.tag_id " +
+                "WHERE o.user_id = :userId " +
+                "GROUP BY t.id, t.name " +
+                "HAVING SUM(o.price) = (SELECT MAX(total_price) " +
+                "                     FROM (SELECT SUM(o.price) AS total_price " +
+                "                           FROM orders o " +
+                "                           JOIN gift_certificates g ON g.id = o.gift_certificate_id " +
+                "                           JOIN gift_certificate_tag gct ON g.id = gct.gift_id " +
+                "                           JOIN tags t ON t.id = gct.tag_id " +
+                "                           WHERE o.user_id = :userId " +
+                "                           GROUP BY t.id, t.name) subquery)";
+
+        Query query = entityManager.createNativeQuery(nativeQuery)
+                .setParameter("userId", userId);
+
+        List<Object[]> resultList = query.getResultList();
+
+        List<Tag> tags = new ArrayList<>();
+
+        for (Object[] result : resultList) {
+            Long tagId = (Long) result[0];
+            String tagName = (String) result[1];
+
+            tags.add(new Tag(tagId, tagName));
         }
+
+        return tags;
     }
 }
