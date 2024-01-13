@@ -18,13 +18,6 @@ public interface BaseService<T> {
     T create(T entity);
 
     /**
-     * Retrieves all entities.
-     *
-     * @return a list of all entities
-     */
-    List<T> findAll();
-
-    /**
      * Retrieves a paginated list of entities.
      *
      * @param page the page number (0-based)

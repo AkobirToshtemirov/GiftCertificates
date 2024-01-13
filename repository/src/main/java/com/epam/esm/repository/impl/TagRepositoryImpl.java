@@ -1,7 +1,5 @@
 package com.epam.esm.repository.impl;
 
-import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Order;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.exception.ValidationException;
@@ -9,14 +7,14 @@ import com.epam.esm.repository.TagRepository;
 import com.epam.esm.validator.EntityValidator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Tuple;
+import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,11 +40,6 @@ public class TagRepositoryImpl implements TagRepository {
     @Override
     public Optional<Tag> findById(Long id) {
         return Optional.ofNullable(entityManager.find(Tag.class, id));
-    }
-
-    @Override
-    public List<Tag> findAll() {
-        return entityManager.createQuery("SELECT t FROM tags t", Tag.class).getResultList();
     }
 
     @Override
@@ -84,37 +77,39 @@ public class TagRepositoryImpl implements TagRepository {
                 .findFirst();
     }
 
+
     @Override
-    public Tag findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Tuple> criteria = cb.createTupleQuery();
+    public List<Tag> findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
+        String nativeQuery = "SELECT t.id, t.name " +
+                "FROM orders o " +
+                "JOIN gift_certificates g ON g.id = o.gift_certificate_id " +
+                "JOIN gift_certificate_tag gct ON g.id = gct.gift_id " +
+                "JOIN tags t ON t.id = gct.tag_id " +
+                "WHERE o.user_id = :userId " +
+                "GROUP BY t.id, t.name " +
+                "HAVING SUM(o.price) = (SELECT MAX(total_price) " +
+                "                     FROM (SELECT SUM(o.price) AS total_price " +
+                "                           FROM orders o " +
+                "                           JOIN gift_certificates g ON g.id = o.gift_certificate_id " +
+                "                           JOIN gift_certificate_tag gct ON g.id = gct.gift_id " +
+                "                           JOIN tags t ON t.id = gct.tag_id " +
+                "                           WHERE o.user_id = :userId " +
+                "                           GROUP BY t.id, t.name) subquery)";
 
-        Root<Order> orderRoot = criteria.from(Order.class);
-        Join<Order, GiftCertificate> giftCertificateJoin = orderRoot.join("giftCertificate");
-        Join<GiftCertificate, Tag> tagJoin = giftCertificateJoin.join("tags");
+        Query query = entityManager.createNativeQuery(nativeQuery)
+                .setParameter("userId", userId);
 
-        criteria.multiselect(
-                tagJoin.get("id").alias("tagId"),
-                tagJoin.get("name").alias("tagName"),
-                cb.sum(orderRoot.get("price")).alias("totalPrice")
-        );
+        List<Object[]> resultList = query.getResultList();
 
-        criteria.where(
-                cb.equal(orderRoot.get("user").get("id"), userId)
-        );
-        criteria.groupBy(tagJoin.get("id"), tagJoin.get("name"));
-        criteria.orderBy(cb.desc(cb.sum(orderRoot.get("price"))));
+        List<Tag> tags = new ArrayList<>();
 
-        TypedQuery<Tuple> query = entityManager.createQuery(criteria);
-        List<Tuple> resultList = query.getResultList();
+        for (Object[] result : resultList) {
+            Long tagId = (Long) result[0];
+            String tagName = (String) result[1];
 
-        if (!resultList.isEmpty()) {
-            Tuple result = resultList.get(0);
-            Long tagId = result.get("tagId", Long.class);
-            String tagName = result.get("tagName", String.class);
-            return new Tag(tagId, tagName);
-        } else {
-            return null;
+            tags.add(new Tag(tagId, tagName));
         }
+
+        return tags;
     }
 }

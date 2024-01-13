@@ -29,12 +29,6 @@ public class UserController {
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id)));
     }
 
-    @GetMapping
-    public CollectionModel<UserModel> getUsers() {
-        List<User> users = userService.findAll();
-        return userModelAssembler.toCollectionModelNoPage(users);
-    }
-
     @GetMapping(value = "/paged")
     public CollectionModel<UserModel> getUsersWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                        @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
@@ -44,8 +38,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}/most-used-tag")
-    public TagModel findMostUsedTagOfUserWithHighestOrderCost(@PathVariable("id") Long userId) {
-        Tag mostUsedTag = userService.findMostUsedTagOfUserWithHighestOrderCost(userId);
-        return userModelAssembler.toTagModel(mostUsedTag, userId);
+    public CollectionModel<TagModel> findMostUsedTagOfUserWithHighestOrderCost(@PathVariable("id") Long userId) {
+        List<Tag> mostUsedTag = userService.findMostUsedTagOfUserWithHighestOrderCost(userId);
+        return userModelAssembler.toCollectionTagModel(mostUsedTag, userId);
     }
 }

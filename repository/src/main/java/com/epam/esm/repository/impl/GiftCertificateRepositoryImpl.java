@@ -42,11 +42,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     }
 
     @Override
-    public List<GiftCertificate> findAll() {
-        return entityManager.createQuery("SELECT g FROM gift_certificates g", GiftCertificate.class).getResultList();
-    }
-
-    @Override
     public List<GiftCertificate> findAllWithPage(int page, int size) throws ValidationException {
         if (page <= 0 || size <= 0)
             throw new ValidationException("Page number and page size must be positive");

@@ -28,12 +28,6 @@ public class OrderController {
                 .orElseThrow(() -> new NotFoundException("Order not found with id: " + id)));
     }
 
-    @GetMapping
-    public CollectionModel<OrderModel> getOrders() {
-        List<Order> orders = orderService.findAll();
-        return orderModelAssembler.toCollectionModelNoPage(orders);
-    }
-
     @GetMapping(value = "/paged")
     public CollectionModel<OrderModel> getOrdersWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                          @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
@@ -54,11 +48,5 @@ public class OrderController {
                                                                  @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
         List<Order> userOrders = orderService.findOrdersInfoByUserIdWithPage(userId, page, size);
         return orderModelAssembler.toCollectionModel(userOrders, page, size);
-    }
-
-    @GetMapping(value = "/{userId}/user-orders/all")
-    public CollectionModel<OrderModel> getAllOrdersByUserId(@PathVariable("userId") Long userId) {
-        List<Order> userOrders = orderService.findOrdersInfoByUserId(userId);
-        return orderModelAssembler.toCollectionModelNoPage(userOrders);
     }
 }

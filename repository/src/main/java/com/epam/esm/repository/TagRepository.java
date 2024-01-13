@@ -2,6 +2,7 @@ package com.epam.esm.repository;
 
 import com.epam.esm.entity.Tag;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,5 +23,5 @@ public interface TagRepository extends BaseRepository<Tag> {
      * @param userId the ID of the user
      * @return the most used Tag of the user with the highest order cost
      */
-    Tag findMostUsedTagOfUserWithHighestOrderCost(Long userId);
+    List<Tag> findMostUsedTagOfUserWithHighestOrderCost(Long userId);
 }

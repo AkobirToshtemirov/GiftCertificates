@@ -41,11 +41,6 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Order> findAll() {
-        return entityManager.createQuery("SELECT o FROM orders o", Order.class).getResultList();
-    }
-
-    @Override
     public List<Order> findAllWithPage(int page, int size) throws ValidationException {
         if (page <= 0 || size <= 0)
             throw new ValidationException("Page number and page size must be positive");

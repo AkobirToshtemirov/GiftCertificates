@@ -12,9 +12,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -65,15 +62,5 @@ public class OrderModelAssembler extends BaseAssembler<Order, OrderModel> {
         orderModel.setOrderedTime(entity.getOrderedTime());
         orderModel.setUserId(entity.getUser().getId());
         orderModel.setGiftCertificateId(entity.getGiftCertificate().getId());
-    }
-
-    @SneakyThrows
-    public CollectionModel<OrderModel> toCollectionModelNoPage(Iterable<? extends Order> entities) {
-        List<OrderModel> models = new ArrayList<>();
-        entities.forEach(order -> models.add(toModel(order)));
-
-        CollectionModel<OrderModel> collectionModel = CollectionModel.of(models);
-        collectionModel.add(linkTo(OrderController.class).withSelfRel());
-        return collectionModel;
     }
 }

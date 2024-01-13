@@ -7,9 +7,6 @@ import lombok.SneakyThrows;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -42,15 +39,5 @@ public class TagModelAssembler extends BaseAssembler<Tag, TagModel> {
         tagModels.add(linkTo(methodOn(TagController.class).getTagsWithPage(page, size)).withSelfRel());
 
         return tagModels;
-    }
-
-    @SneakyThrows
-    public CollectionModel<TagModel> toCollectionModelNoPage(Iterable<? extends Tag> entities) {
-        List<TagModel> models = new ArrayList<>();
-        entities.forEach(tag -> models.add(toModel(tag)));
-
-        CollectionModel<TagModel> collectionModel = CollectionModel.of(models);
-        collectionModel.add(linkTo(TagController.class).withSelfRel());
-        return collectionModel;
     }
 }

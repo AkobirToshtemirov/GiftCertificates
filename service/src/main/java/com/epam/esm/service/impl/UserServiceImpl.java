@@ -24,11 +24,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    @Override
     public List<User> findAllWithPage(int page, int size) {
         try {
             return userRepository.findAllWithPage(page, size);
@@ -43,7 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Tag findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
+    public List<Tag> findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
         return tagRepository.findMostUsedTagOfUserWithHighestOrderCost(userId);
     }
 }

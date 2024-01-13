@@ -1,6 +1,5 @@
 package com.epam.esm.model;
 
-import com.epam.esm.entity.GiftCertificate;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
@@ -21,7 +20,6 @@ public class OrderModel extends RepresentationModel<OrderModel> {
     private Long id;
     private BigDecimal price;
     private LocalDateTime orderedTime;
-    private GiftCertificate giftCertificate;
     private Long giftCertificateId;
     private Long userId;
 }

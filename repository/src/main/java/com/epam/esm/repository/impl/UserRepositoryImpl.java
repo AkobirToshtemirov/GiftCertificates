@@ -40,11 +40,6 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
-        return entityManager.createQuery("SELECT u FROM users u", User.class).getResultList();
-    }
-
-    @Override
     public List<User> findAllWithPage(int page, int size) throws ValidationException {
         if (page <= 0 || size <= 0)
             throw new ValidationException("Page number and page size must be positive");

@@ -19,13 +19,6 @@ public interface OrderService {
     Order create(Long userId, Long giftCertificateId);
 
     /**
-     * Retrieves all Orders.
-     *
-     * @return a list of all Orders
-     */
-    List<Order> findAll();
-
-    /**
      * Retrieves a paginated list of Orders.
      *
      * @param page the page number (0-based)

@@ -16,14 +16,7 @@ public interface UserService {
      * @param userId the ID of the user
      * @return the most used Tag of the user with the highest order cost
      */
-    Tag findMostUsedTagOfUserWithHighestOrderCost(Long userId);
-
-    /**
-     * Retrieves all Users.
-     *
-     * @return a list of all Users
-     */
-    List<User> findAll();
+    List<Tag> findMostUsedTagOfUserWithHighestOrderCost(Long userId);
 
     /**
      * Retrieves a paginated list of Users.

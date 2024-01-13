@@ -24,8 +24,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 public class UserModelAssembler extends BaseAssembler<User, UserModel> {
-    public UserModelAssembler() {
+    private final TagModelAssembler tagModelAssembler;
+
+    public UserModelAssembler(TagModelAssembler tagModelAssembler) {
         super(UserController.class, UserModel.class);
+        this.tagModelAssembler = tagModelAssembler;
     }
 
     @Override
@@ -87,30 +90,17 @@ public class UserModelAssembler extends BaseAssembler<User, UserModel> {
     }
 
     @SneakyThrows
-    public CollectionModel<UserModel> toCollectionModelNoPage(Iterable<? extends User> entities) {
-        List<UserModel> models = new ArrayList<>();
-        entities.forEach(user -> models.add(toModel(user)));
+    public CollectionModel<TagModel> toCollectionTagModel(Iterable<? extends Tag> entities, Long userId) {
+        List<TagModel> models = new ArrayList<>();
+        entities.forEach(tag -> models.add(tagModelAssembler.toModel(tag)));
 
-        CollectionModel<UserModel> collectionModel = CollectionModel.of(models);
-        collectionModel.add(linkTo(UserController.class).withSelfRel());
-        return collectionModel;
-    }
+        CollectionModel<TagModel> collectionModel = CollectionModel.of(models);
+        collectionModel.add(linkTo(TagController.class).withSelfRel());
 
-    @SneakyThrows
-    public TagModel toTagModel(Tag tag, Long userId) {
-        TagModel tagModel = TagModel.builder()
-                .id(tag.getId())
-                .name(tag.getName())
-                .build();
-
-        tagModel.add(linkTo(methodOn(TagController.class)
-                .getTag(tag.getId()))
-                .withSelfRel());
-
-        tagModel.add(linkTo(methodOn(UserController.class)
+        collectionModel.add(linkTo(methodOn(UserController.class)
                 .getUser(userId))
                 .withRel("user"));
 
-        return tagModel;
+        return collectionModel;
     }
 }

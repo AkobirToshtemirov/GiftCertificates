@@ -43,11 +43,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public List<GiftCertificate> findAll() {
-        return giftCertificateRepository.findAll();
-    }
-
-    @Override
     public List<GiftCertificate> findAllWithPage(int page, int size) {
         return giftCertificateRepository.findAllWithPage(page, size);
     }

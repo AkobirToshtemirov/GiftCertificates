@@ -32,12 +32,6 @@ public class GiftCertificateController {
                 .orElseThrow(() -> new NotFoundException("Gift Certificate not found with id: " + id)));
     }
 
-    @GetMapping
-    public CollectionModel<GiftCertificateModel> getGiftCertificates() {
-        List<GiftCertificate> giftCertificates = giftCertificateService.findAll();
-        return giftCertificateModelAssembler.toCollectionModelNoPage(giftCertificates);
-    }
-
     @GetMapping(value = "/paged")
     public CollectionModel<GiftCertificateModel> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                                              @RequestParam(required = false, defaultValue = "10", name = "size") int size) {

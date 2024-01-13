@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -31,6 +32,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order create(Long userId, Long giftCertificateId) {
+        if (Objects.isNull(userId)) {
+            throw new ValidationException("User Id cannot be empty!");
+        }
+        if (Objects.isNull(giftCertificateId)) {
+            throw new ValidationException("GiftCertificate Id cannot be empty!");
+        }
+
         User user = userService.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User is not found with id: " + userId));
 
@@ -44,11 +52,6 @@ public class OrderServiceImpl implements OrderService {
         order.setPrice(giftCertificate.getPrice());
 
         return orderRepository.save(order);
-    }
-
-    @Override
-    public List<Order> findAll() {
-        return orderRepository.findAll();
     }
 
     @Override

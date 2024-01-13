@@ -30,12 +30,6 @@ public class TagController {
                 .orElseThrow(() -> new NotFoundException("Tag not found with id: " + id)));
     }
 
-    @GetMapping
-    public CollectionModel<TagModel> getTags() {
-        List<Tag> tags = tagService.findAll();
-        return tagModelAssembler.toCollectionModelNoPage(tags);
-    }
-
     @GetMapping(value = "/paged")
     public CollectionModel<TagModel> getTagsWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                      @RequestParam(required = false, defaultValue = "10", name = "size") int size) {

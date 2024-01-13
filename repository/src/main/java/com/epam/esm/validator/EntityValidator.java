@@ -19,6 +19,7 @@ public class EntityValidator {
             StringBuilder errorMessage = new StringBuilder("Validation error(s) occurred for ");
             errorMessage.append(entity.getClass().getSimpleName()).append(" entity: ");
             for (ConstraintViolation<T> violation : violations) {
+                errorMessage.append("Property '").append(violation.getPropertyPath()).append("': ");
                 errorMessage.append(violation.getMessage()).append("; ");
             }
             throw new ValidationException(errorMessage.toString());

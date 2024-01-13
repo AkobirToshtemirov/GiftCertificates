@@ -25,11 +25,6 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findAll() {
-        return tagRepository.findAll();
-    }
-
-    @Override
     public List<Tag> findAllWithPage(int page, int size) {
         return tagRepository.findAllWithPage(page, size);
     }
