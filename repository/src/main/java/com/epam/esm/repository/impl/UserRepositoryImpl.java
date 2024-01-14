@@ -28,7 +28,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User entity) {
-        entityValidator.validateEntity(entity);
+//        entityValidator.validateEntity(entity);
 
         entityManager.persist(entity);
         return entity;
@@ -63,5 +63,23 @@ public class UserRepositoryImpl implements UserRepository {
         if (user == null)
             throw new NotFoundException("User not found with id: " + id);
         entityManager.remove(user);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return entityManager.createQuery("SELECT u FROM users u WHERE u.username = :username", User.class)
+                .setParameter("username", username)
+                .getResultList()
+                .stream()
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return entityManager.createQuery("SELECT u FROM users u WHERE u.email = :email", User.class)
+                .setParameter("email", email)
+                .getResultList()
+                .stream()
+                .findFirst();
     }
 }

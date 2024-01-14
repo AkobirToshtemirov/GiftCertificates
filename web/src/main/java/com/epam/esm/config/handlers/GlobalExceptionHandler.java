@@ -1,6 +1,7 @@
 package com.epam.esm.config.handlers;
 
 import com.epam.esm.dto.ErrorResponseDTO;
+import com.epam.esm.exception.AuthException;
 import com.epam.esm.exception.NotFoundException;
 import com.epam.esm.exception.OperationException;
 import com.epam.esm.exception.ValidationException;
@@ -24,6 +25,17 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponseDTO.builder()
                         .errorPath(req.getRequestURI())
                         .errorCode(HttpStatus.NOT_FOUND.value())
+                        .errorBody(e.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResponseDTO> authExceptionHandler(AuthException e, HttpServletRequest req) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponseDTO.builder()
+                        .errorPath(req.getRequestURI())
+                        .errorCode(HttpStatus.BAD_REQUEST.value())
                         .errorBody(e.getMessage())
                         .build());
     }

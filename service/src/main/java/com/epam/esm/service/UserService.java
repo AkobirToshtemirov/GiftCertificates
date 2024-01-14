@@ -1,5 +1,7 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.TokenRequest;
+import com.epam.esm.dto.UserRegisterDTO;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 
@@ -34,4 +36,8 @@ public interface UserService {
      * @return an {@code Optional} containing the User, or empty if not found
      */
     Optional<User> findById(Long id);
+
+    String register(UserRegisterDTO dto);
+
+    String generateToken(TokenRequest request);
 }
