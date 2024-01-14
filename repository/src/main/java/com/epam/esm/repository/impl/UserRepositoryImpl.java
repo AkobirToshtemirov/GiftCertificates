@@ -28,7 +28,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User entity) {
-//        entityValidator.validateEntity(entity);
+        entityValidator.validateEntity(entity);
 
         entityManager.persist(entity);
         return entity;

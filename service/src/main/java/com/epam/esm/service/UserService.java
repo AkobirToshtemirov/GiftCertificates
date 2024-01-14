@@ -12,11 +12,12 @@ import java.util.Optional;
  * Service interface for CRUD operations on User entities.
  */
 public interface UserService {
+
     /**
-     * Retrieves the most used Tag of a User with the highest order cost.
+     * Retrieves the most used Tags of a User with the highest order cost.
      *
      * @param userId the ID of the user
-     * @return the most used Tag of the user with the highest order cost
+     * @return a list of most used Tags of the user with the highest order cost
      */
     List<Tag> findMostUsedTagOfUserWithHighestOrderCost(Long userId);
 
@@ -37,7 +38,19 @@ public interface UserService {
      */
     Optional<User> findById(Long id);
 
+    /**
+     * Registers a new user based on the provided registration information.
+     *
+     * @param dto the UserRegisterDTO containing registration information
+     * @return a confirmation message for successful registration
+     */
     String register(UserRegisterDTO dto);
 
+    /**
+     * Generates an authentication token based on the provided token request.
+     *
+     * @param request the TokenRequest containing authentication information
+     * @return the generated authentication token
+     */
     String generateToken(TokenRequest request);
 }

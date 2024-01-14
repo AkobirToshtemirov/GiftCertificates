@@ -33,7 +33,6 @@ public class JwtTokenUtil {
             return expiration.after(new Date());
         } catch (Exception e) {
             e.printStackTrace();
-//            throw new ValidationException("Token is not valid");
         }
         return false;
     }
