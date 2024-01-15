@@ -23,7 +23,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Positive
+    @Positive(message = "Order price must be positive")
     private BigDecimal price;
 
     @Column(name = "ordered_time")

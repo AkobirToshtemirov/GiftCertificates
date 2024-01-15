@@ -20,48 +20,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> error404(NotFoundException e, HttpServletRequest req) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ErrorResponseDTO.builder()
-                        .errorPath(req.getRequestURI())
-                        .errorCode(HttpStatus.NOT_FOUND.value())
-                        .errorBody(e.getMessage())
-                        .build());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, e.getMessage(), req);
     }
 
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<ErrorResponseDTO> authExceptionHandler(AuthException e, HttpServletRequest req) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponseDTO.builder()
-                        .errorPath(req.getRequestURI())
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
-                        .errorBody(e.getMessage())
-                        .build());
+    @ExceptionHandler({AuthException.class, OperationException.class, ValidationException.class})
+    public ResponseEntity<ErrorResponseDTO> generalExceptionHandler(Exception e, HttpServletRequest req) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), req);
     }
-
-    @ExceptionHandler(OperationException.class)
-    public ResponseEntity<ErrorResponseDTO> operationExceptionHandler(OperationException e, HttpServletRequest req) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponseDTO.builder()
-                        .errorPath(req.getRequestURI())
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
-                        .errorBody(e.getMessage())
-                        .build());
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponseDTO> validationExceptionHandler(ValidationException e, HttpServletRequest req) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponseDTO.builder()
-                        .errorPath(req.getRequestURI())
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
-                        .errorBody(e.getMessage())
-                        .build());
-    }
-
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> notValidExceptionHandler(MethodArgumentNotValidException e, HttpServletRequest req) {
@@ -78,11 +43,15 @@ public class GlobalExceptionHandler {
             });
         }
 
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, errorBody, req);
+    }
+
+    private ResponseEntity<ErrorResponseDTO> buildErrorResponse(HttpStatus status, Object errorBody, HttpServletRequest req) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(status)
                 .body(ErrorResponseDTO.builder()
                         .errorPath(req.getRequestURI())
-                        .errorCode(HttpStatus.BAD_REQUEST.value())
+                        .errorCode(status.value())
                         .errorBody(errorBody)
                         .build());
     }
