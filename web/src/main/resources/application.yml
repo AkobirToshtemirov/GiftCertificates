@@ -10,6 +10,14 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
+application:
+  security:
+    jwt:
+      token:
+        secret-key: 7134743777217A25432A462D4A614E645267556B58703272357538782F413F44
+        issuer: https://gift-certificates.app
+        expiration: 86400000
+
 ---
 
 spring:
