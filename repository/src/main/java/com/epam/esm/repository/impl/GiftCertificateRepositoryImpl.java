@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@link GiftCertificateRepository} interface.
+ */
+
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     @PersistenceContext
@@ -28,6 +32,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         this.entityValidator = entityValidator;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GiftCertificate save(GiftCertificate entity) {
         entityValidator.validateEntity(entity);
@@ -36,11 +43,17 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         return entity;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<GiftCertificate> findById(Long id) {
         return Optional.ofNullable(entityManager.find(GiftCertificate.class, id));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<GiftCertificate> findAllWithPage(int page, int size) throws ValidationException {
         if (page <= 0 || size <= 0)
@@ -52,6 +65,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 .getResultList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(Long id) throws NotFoundException {
         GiftCertificate giftCertificate = entityManager.find(GiftCertificate.class, id);
@@ -60,6 +76,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         entityManager.remove(giftCertificate);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GiftCertificate update(GiftCertificate giftCertificate) throws NotFoundException, OperationException {
         entityValidator.validateEntity(giftCertificate);
@@ -75,6 +94,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<GiftCertificate> findCertificatesByCriteria(List<String> tagNames, String search, String sortBy, boolean ascending) throws OperationException {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

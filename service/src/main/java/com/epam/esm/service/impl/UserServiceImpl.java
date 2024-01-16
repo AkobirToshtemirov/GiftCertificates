@@ -1,7 +1,9 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.config.security.JwtTokenUtil;
+import com.epam.esm.dto.MessageDTO;
 import com.epam.esm.dto.TokenRequest;
+import com.epam.esm.dto.TokenResponse;
 import com.epam.esm.dto.UserRegisterDTO;
 import com.epam.esm.entity.Role;
 import com.epam.esm.entity.Tag;
@@ -23,6 +25,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@link UserService} interface.
+ */
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -42,6 +47,9 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<User> findAllWithPage(int page, int size) {
         try {
@@ -51,13 +59,19 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String register(@NonNull UserRegisterDTO dto) {
+    public MessageDTO register(@NonNull UserRegisterDTO dto) {
         if (userRepository.findByEmail(dto.email()).isPresent()) {
             throw new AuthException("Email is already taken");
         }
@@ -77,16 +91,22 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        return "Success";
+        return new MessageDTO("Successfully registered!");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String generateToken(@NonNull TokenRequest request) {
+    public TokenResponse generateToken(@NonNull TokenRequest request) {
         var authenticationToken = new UsernamePasswordAuthenticationToken(request.username(), request.password());
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(request.username());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Tag> findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
         return tagRepository.findMostUsedTagOfUserWithHighestOrderCost(userId);

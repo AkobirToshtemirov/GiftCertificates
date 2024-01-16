@@ -1,6 +1,8 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.dto.MessageDTO;
 import com.epam.esm.dto.TokenRequest;
+import com.epam.esm.dto.TokenResponse;
 import com.epam.esm.dto.UserRegisterDTO;
 import com.epam.esm.service.UserService;
 import jakarta.validation.Valid;
@@ -19,13 +21,14 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping("/generate-token")
-    public ResponseEntity<String> generateToken(@Valid @RequestBody TokenRequest request) {
-        return ResponseEntity.ok(userService.generateToken(request));
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponse> generateToken(@Valid @RequestBody TokenRequest request) {
+        TokenResponse tokenResponse = userService.generateToken(request);
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> createUser(@Valid @RequestBody UserRegisterDTO dto) {
+    public ResponseEntity<MessageDTO> createUser(@Valid @RequestBody UserRegisterDTO dto) {
         return ResponseEntity.status(201).body(userService.register(dto));
     }
 }

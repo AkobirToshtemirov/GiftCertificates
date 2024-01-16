@@ -1,6 +1,8 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.MessageDTO;
 import com.epam.esm.dto.TokenRequest;
+import com.epam.esm.dto.TokenResponse;
 import com.epam.esm.dto.UserRegisterDTO;
 import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
@@ -44,7 +46,7 @@ public interface UserService {
      * @param dto the UserRegisterDTO containing registration information
      * @return a confirmation message for successful registration
      */
-    String register(UserRegisterDTO dto);
+    MessageDTO register(UserRegisterDTO dto);
 
     /**
      * Generates an authentication token based on the provided token request.
@@ -52,5 +54,5 @@ public interface UserService {
      * @param request the TokenRequest containing authentication information
      * @return the generated authentication token
      */
-    String generateToken(TokenRequest request);
+    TokenResponse generateToken(TokenRequest request);
 }

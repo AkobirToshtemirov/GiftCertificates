@@ -24,14 +24,14 @@ public class OrderController {
     }
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public OrderModel getOrder(@PathVariable("id") Long id) {
         return orderModelAssembler.toModel(orderService.findById(id)
                 .orElseThrow(() -> new NotFoundException("Order not found with id: " + id)));
     }
 
     @GetMapping(value = "/paged")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public CollectionModel<OrderModel> getOrdersWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                          @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
         List<Order> orders = orderService.findAllWithPage(page, size);
@@ -40,14 +40,14 @@ public class OrderController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public OrderModel createOrder(@RequestBody OrderDTO dto) {
         Order createdOrder = orderService.create(dto.userId(), dto.giftCertificateId());
         return orderModelAssembler.toModel(createdOrder);
     }
 
     @GetMapping(value = "/{userId}/user-orders")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public CollectionModel<OrderModel> getOrdersByUserIdWithPage(@PathVariable("userId") Long userId,
                                                                  @RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                                  @RequestParam(required = false, defaultValue = "10", name = "size") int size) {

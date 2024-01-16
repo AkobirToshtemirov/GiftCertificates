@@ -25,14 +25,14 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public UserModel getUser(@PathVariable("id") Long id) {
         return userModelAssembler.toModel(userService.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + id)));
     }
 
     @GetMapping(value = "/paged")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public CollectionModel<UserModel> getUsersWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                        @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
         List<User> users = userService.findAllWithPage(page, size);
@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/most-used-tag")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public CollectionModel<TagModel> findMostUsedTagOfUserWithHighestOrderCost(@PathVariable("id") Long userId) {
         List<Tag> mostUsedTag = userService.findMostUsedTagOfUserWithHighestOrderCost(userId);
         return userModelAssembler.toCollectionTagModel(mostUsedTag, userId);

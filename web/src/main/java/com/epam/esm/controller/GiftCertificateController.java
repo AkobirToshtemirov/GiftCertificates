@@ -28,14 +28,12 @@ public class GiftCertificateController {
     }
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
     public GiftCertificateModel getGiftCertificate(@PathVariable("id") Long id) {
         return giftCertificateModelAssembler.toModel(giftCertificateService.findById(id)
                 .orElseThrow(() -> new NotFoundException("Gift Certificate not found with id: " + id)));
     }
 
     @GetMapping(value = "/paged")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
     public CollectionModel<GiftCertificateModel> getGiftCertificatesWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                                              @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
         List<GiftCertificate> giftCertificates = giftCertificateService.findAllWithPage(page, size);
@@ -44,28 +42,27 @@ public class GiftCertificateController {
     }
 
     @PostMapping()
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public GiftCertificateModel saveGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
         GiftCertificate savedGiftCertificate = giftCertificateService.create(giftCertificate);
         return giftCertificateModelAssembler.toModel(savedGiftCertificate);
     }
 
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteGiftCertificate(@PathVariable("id") Long id) {
         giftCertificateService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping(value = "/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public GiftCertificateModel updateGiftCertificate(@PathVariable("id") Long id, @RequestBody GiftCertificate updatedGiftCertificate) {
         GiftCertificate giftCertificate = giftCertificateService.update(id, updatedGiftCertificate);
         return giftCertificateModelAssembler.toModel(giftCertificate);
     }
 
     @GetMapping(value = "/search")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
     public CollectionModel<GiftCertificateModel> findCertificatesByCriteria(
             @RequestParam(value = "tag", required = false) List<String> tagNames,
             @RequestParam(value = "search", required = false) String search,
@@ -77,7 +74,7 @@ public class GiftCertificateController {
     }
 
     @PatchMapping(value = "/{id}/duration")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public GiftCertificateModel updateGiftCertificateDuration(@PathVariable("id") Long id, @RequestBody Map<String, Double> requestBody) {
         if (!requestBody.containsKey("duration"))
             throw new ValidationException("Request body should contain 'duration' field.");
@@ -88,7 +85,7 @@ public class GiftCertificateController {
     }
 
     @PatchMapping(value = "/{id}/price")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public GiftCertificateModel updateGiftCertificatePrice(@PathVariable("id") Long id, @RequestBody Map<String, BigDecimal> requestBody) {
         if (!requestBody.containsKey("price"))
             throw new ValidationException("Request body should contain 'price' field.");

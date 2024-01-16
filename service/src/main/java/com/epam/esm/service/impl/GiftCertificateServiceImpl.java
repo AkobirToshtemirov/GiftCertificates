@@ -15,6 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@link GiftCertificateService} interface.
+ */
 @Service
 @Transactional
 public class GiftCertificateServiceImpl implements GiftCertificateService {
@@ -24,7 +27,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         this.giftCertificateRepository = giftCertificateRepository;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GiftCertificate create(GiftCertificate entity) {
         entity.setCreatedDate(LocalDateTime.now());
@@ -42,16 +47,25 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return giftCertificateRepository.save(entity);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<GiftCertificate> findAllWithPage(int page, int size) {
         return giftCertificateRepository.findAllWithPage(page, size);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<GiftCertificate> findById(Long id) {
         return giftCertificateRepository.findById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(Long id) {
         try {
@@ -61,6 +75,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GiftCertificate update(Long id, GiftCertificate updatedGiftCertificate) {
         if (giftCertificateRepository.findById(id).isEmpty())
@@ -72,11 +89,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return giftCertificateRepository.update(updatedGiftCertificate);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<GiftCertificate> findCertificatesByCriteria(List<String> tagNames, String search, String sortBy, boolean ascending) {
         return giftCertificateRepository.findCertificatesByCriteria(tagNames, search, sortBy, ascending);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GiftCertificate updateGiftCertificateDuration(Long id, Double duration) {
         GiftCertificate giftCertificate = giftCertificateRepository.findById(id)
@@ -88,6 +111,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return giftCertificateRepository.save(giftCertificate);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public GiftCertificate updateGiftCertificatePrice(Long id, BigDecimal price) {
         GiftCertificate giftCertificate = giftCertificateRepository.findById(id)

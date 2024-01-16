@@ -16,6 +16,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@link OrderRepository} interface.
+ */
 @Repository
 public class OrderRepositoryImpl implements OrderRepository {
     @PersistenceContext
@@ -27,6 +30,9 @@ public class OrderRepositoryImpl implements OrderRepository {
         this.entityValidator = entityValidator;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Order save(Order entity) {
         entityValidator.validateEntity(entity);
@@ -35,11 +41,17 @@ public class OrderRepositoryImpl implements OrderRepository {
         return entity;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Order> findById(Long id) {
         return Optional.ofNullable(entityManager.find(Order.class, id));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Order> findAllWithPage(int page, int size) throws ValidationException {
         if (page <= 0 || size <= 0)
@@ -58,6 +70,9 @@ public class OrderRepositoryImpl implements OrderRepository {
         return typedQuery.getResultList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(Long id) throws NotFoundException {
         Order order = entityManager.find(Order.class, id);
@@ -66,6 +81,9 @@ public class OrderRepositoryImpl implements OrderRepository {
         entityManager.remove(order);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Order> findOrdersInfoByUserIdWithPage(Long userId, int page, int size) {
         if (page <= 0 || size <= 0)
@@ -85,6 +103,9 @@ public class OrderRepositoryImpl implements OrderRepository {
         return typedQuery.getResultList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Order> findOrdersInfoByUserId(Long userId) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();

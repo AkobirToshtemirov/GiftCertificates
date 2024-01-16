@@ -19,7 +19,7 @@ public class RoleController {
     }
 
     @PostMapping()
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Role> saveTag(@RequestBody Role role) {
         return ResponseEntity.ok(roleService.save(role));
     }

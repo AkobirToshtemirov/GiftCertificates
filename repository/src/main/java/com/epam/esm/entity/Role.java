@@ -20,7 +20,7 @@ public class Role {
     @NotBlank(message = "Role name must not be blank")
     private String name;
 
-    @NotBlank(message = "Role code must not be blank. Example: USER, ADMIN, MANAGER")
+    @NotBlank(message = "Role code must not be blank. Example: USER, ADMIN")
     private String code;
 
     @ManyToMany(mappedBy = "roles")

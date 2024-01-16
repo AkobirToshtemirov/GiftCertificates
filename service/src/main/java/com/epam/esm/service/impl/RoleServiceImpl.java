@@ -6,6 +6,9 @@ import com.epam.esm.service.RoleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation of the {@link RoleService} interface.
+ */
 @Service
 @Transactional
 public class RoleServiceImpl implements RoleService {
@@ -15,6 +18,9 @@ public class RoleServiceImpl implements RoleService {
         this.roleRepository = roleRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Role save(Role role) {
         return roleRepository.save(role);

@@ -1,5 +1,6 @@
 package com.epam.esm.config.security;
 
+import com.epam.esm.dto.TokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,15 +26,18 @@ public class JwtTokenUtil {
     private Long expiration;
 
 
-    public String generateToken(@NonNull String username) {
+    public TokenResponse generateToken(@NonNull String username) {
         Date date = new Date();
-        return Jwts.builder()
+
+        String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(date)
                 .setIssuer(issuer)
                 .setExpiration(new Date(date.getTime() + expiration))
                 .signWith(signKey(), SignatureAlgorithm.HS256)
                 .compact();
+
+        return new TokenResponse(token);
     }
 
     public boolean isValid(@NonNull String token) {

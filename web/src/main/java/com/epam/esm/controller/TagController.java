@@ -26,14 +26,14 @@ public class TagController {
     }
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public TagModel getTag(@PathVariable("id") Long id) {
         return tagModelAssembler.toModel(tagService.findById(id)
                 .orElseThrow(() -> new NotFoundException("Tag not found with id: " + id)));
     }
 
     @GetMapping(value = "/paged")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER','ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public CollectionModel<TagModel> getTagsWithPage(@RequestParam(required = false, defaultValue = "1", name = "page") int page,
                                                      @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
 
@@ -43,14 +43,14 @@ public class TagController {
     }
 
     @PostMapping()
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public TagModel saveTag(@RequestBody Tag tag) {
         Tag savedTag = tagService.create(tag);
         return tagModelAssembler.toModel(savedTag);
     }
 
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteTag(@PathVariable("id") Long id) {
         tagService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
