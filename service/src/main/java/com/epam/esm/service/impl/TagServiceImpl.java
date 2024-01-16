@@ -14,7 +14,6 @@ import java.util.Optional;
  * Implementation of the {@link TagService} interface.
  */
 @Service
-@Transactional
 public class TagServiceImpl implements TagService {
     private final TagRepository tagRepository;
 
@@ -26,6 +25,7 @@ public class TagServiceImpl implements TagService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public Tag create(Tag entity) {
         return tagRepository.save(entity);
     }
@@ -50,6 +50,7 @@ public class TagServiceImpl implements TagService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void delete(Long id) {
         try {
             tagRepository.delete(id);

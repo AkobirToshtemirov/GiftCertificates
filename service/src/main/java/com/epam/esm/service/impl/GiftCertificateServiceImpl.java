@@ -19,7 +19,6 @@ import java.util.Optional;
  * Implementation of the {@link GiftCertificateService} interface.
  */
 @Service
-@Transactional
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateRepository giftCertificateRepository;
 
@@ -31,6 +30,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public GiftCertificate create(GiftCertificate entity) {
         entity.setCreatedDate(LocalDateTime.now());
         List<Tag> tags = entity.getTags();
@@ -67,6 +67,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void delete(Long id) {
         try {
             giftCertificateRepository.delete(id);
@@ -79,6 +80,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public GiftCertificate update(Long id, GiftCertificate updatedGiftCertificate) {
         if (giftCertificateRepository.findById(id).isEmpty())
             throw new NotFoundException("Gift Certificate not found with id: " + id);
@@ -101,6 +103,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public GiftCertificate updateGiftCertificateDuration(Long id, Double duration) {
         GiftCertificate giftCertificate = giftCertificateRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Gift Certificate not found with id: " + id));
@@ -115,6 +118,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public GiftCertificate updateGiftCertificatePrice(Long id, BigDecimal price) {
         GiftCertificate giftCertificate = giftCertificateRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Gift Certificate not found with id: " + id));

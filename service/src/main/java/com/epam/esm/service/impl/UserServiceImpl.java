@@ -29,7 +29,6 @@ import java.util.Optional;
  * Implementation of the {@link UserService} interface.
  */
 @Service
-@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TagRepositoryImpl tagRepository;
@@ -71,6 +70,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public MessageDTO register(@NonNull UserRegisterDTO dto) {
         if (userRepository.findByEmail(dto.email()).isPresent()) {
             throw new AuthException("Email is already taken");

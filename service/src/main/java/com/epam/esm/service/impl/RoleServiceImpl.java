@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
  * Implementation of the {@link RoleService} interface.
  */
 @Service
-@Transactional
 public class RoleServiceImpl implements RoleService {
     private final RoleRepositoryImpl roleRepository;
 
@@ -22,6 +21,7 @@ public class RoleServiceImpl implements RoleService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public Role save(Role role) {
         return roleRepository.save(role);
     }

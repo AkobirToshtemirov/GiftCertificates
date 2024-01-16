@@ -21,7 +21,6 @@ import java.util.Optional;
  * Implementation of the {@link OrderService} interface.
  */
 @Service
-@Transactional
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final UserService userService;
@@ -37,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public Order create(Long userId, Long giftCertificateId) {
         if (Objects.isNull(userId)) {
             throw new ValidationException("User Id cannot be empty!");
