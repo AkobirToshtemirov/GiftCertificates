@@ -11,14 +11,6 @@ import java.util.Optional;
 public interface RoleRepository {
 
     /**
-     * Saves the given Role entity.
-     *
-     * @param role the Role entity to be saved
-     * @return the saved Role entity
-     */
-    Role save(Role role);
-
-    /**
      * Retrieves a Role by its code.
      *
      * @param code the code of the Role to be retrieved

@@ -29,17 +29,6 @@ public class RoleRepositoryImpl implements RoleRepository {
      * {@inheritDoc}
      */
     @Override
-    public Role save(Role role) {
-        entityValidator.validateEntity(role);
-
-        entityManager.persist(role);
-        return role;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Optional<Role> findByCode(String code) {
         String jpql = "SELECT r FROM Role r WHERE r.code = :code";
         TypedQuery<Role> query = entityManager.createQuery(jpql, Role.class);
