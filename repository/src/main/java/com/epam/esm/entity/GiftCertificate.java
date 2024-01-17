@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,13 +26,18 @@ public class GiftCertificate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Name cannot be blank")
+    @Size(min = 2, max = 255, message = "Name must be between 2 and 255 characters")
     private String name;
-    @NotBlank
+
+    @NotBlank(message = "Description cannot be blank")
+    @Size(min = 2, max = 1000, message = "Description must be between 2 and 1000 characters")
     private String description;
-    @Positive
+
+    @Positive(message = "Price must be positive")
     private BigDecimal price;
-    @Positive
+
+    @Positive(message = "Duration must be positive")
     private Double duration;
 
     @Column(name = "created_date")

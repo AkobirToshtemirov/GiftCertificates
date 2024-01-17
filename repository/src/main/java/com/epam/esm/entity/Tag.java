@@ -22,7 +22,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Tag name must not be blank")
     private String name;
 
     @ManyToMany(mappedBy = "tags")

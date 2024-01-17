@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@link TagRepository} interface.
+ */
 @Repository
 public class TagRepositoryImpl implements TagRepository {
     @PersistenceContext
@@ -29,6 +32,9 @@ public class TagRepositoryImpl implements TagRepository {
         this.entityValidator = entityValidator;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Tag save(Tag entity) {
         entityValidator.validateEntity(entity);
@@ -37,11 +43,17 @@ public class TagRepositoryImpl implements TagRepository {
         return entity;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Tag> findById(Long id) {
         return Optional.ofNullable(entityManager.find(Tag.class, id));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Tag> findAllWithPage(int page, int size) throws ValidationException {
         if (page <= 0 || size <= 0)
@@ -60,6 +72,9 @@ public class TagRepositoryImpl implements TagRepository {
         return typedQuery.getResultList();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(Long id) throws NotFoundException {
         Tag tag = entityManager.find(Tag.class, id);
@@ -68,6 +83,9 @@ public class TagRepositoryImpl implements TagRepository {
         entityManager.remove(tag);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Tag> findByName(String name) {
         return entityManager.createQuery("SELECT t FROM tags t WHERE t.name = :name", Tag.class)
@@ -77,7 +95,9 @@ public class TagRepositoryImpl implements TagRepository {
                 .findFirst();
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Tag> findMostUsedTagOfUserWithHighestOrderCost(Long userId) {
         String nativeQuery = "SELECT t.id, t.name " +

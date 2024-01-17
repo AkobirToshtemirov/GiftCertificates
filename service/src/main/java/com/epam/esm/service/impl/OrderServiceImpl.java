@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Implementation of the {@link OrderService} interface.
+ */
 @Service
-@Transactional
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final UserService userService;
@@ -30,7 +32,11 @@ public class OrderServiceImpl implements OrderService {
         this.giftCertificateService = giftCertificateService;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @Transactional
     public Order create(Long userId, Long giftCertificateId) {
         if (Objects.isNull(userId)) {
             throw new ValidationException("User Id cannot be empty!");
@@ -54,6 +60,9 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Order> findAllWithPage(int page, int size) {
         try {
@@ -63,11 +72,17 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<Order> findById(Long id) {
         return orderRepository.findById(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Order> findOrdersInfoByUserIdWithPage(Long userId, int page, int size) {
         userService.findById(userId).orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
@@ -79,6 +94,9 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Order> findOrdersInfoByUserId(Long userId) {
         userService.findById(userId).orElseThrow(() -> new NotFoundException("User not found with id: " + userId));

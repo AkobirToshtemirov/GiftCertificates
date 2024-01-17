@@ -9,6 +9,7 @@ import com.epam.esm.service.GiftCertificateService;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -41,18 +42,21 @@ public class GiftCertificateController {
     }
 
     @PostMapping()
+    @PreAuthorize("hasRole('ADMIN')")
     public GiftCertificateModel saveGiftCertificate(@RequestBody GiftCertificate giftCertificate) {
         GiftCertificate savedGiftCertificate = giftCertificateService.create(giftCertificate);
         return giftCertificateModelAssembler.toModel(savedGiftCertificate);
     }
 
     @DeleteMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteGiftCertificate(@PathVariable("id") Long id) {
         giftCertificateService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping(value = "/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public GiftCertificateModel updateGiftCertificate(@PathVariable("id") Long id, @RequestBody GiftCertificate updatedGiftCertificate) {
         GiftCertificate giftCertificate = giftCertificateService.update(id, updatedGiftCertificate);
         return giftCertificateModelAssembler.toModel(giftCertificate);
@@ -70,6 +74,7 @@ public class GiftCertificateController {
     }
 
     @PatchMapping(value = "/{id}/duration")
+    @PreAuthorize("hasRole('ADMIN')")
     public GiftCertificateModel updateGiftCertificateDuration(@PathVariable("id") Long id, @RequestBody Map<String, Double> requestBody) {
         if (!requestBody.containsKey("duration"))
             throw new ValidationException("Request body should contain 'duration' field.");
@@ -80,6 +85,7 @@ public class GiftCertificateController {
     }
 
     @PatchMapping(value = "/{id}/price")
+    @PreAuthorize("hasRole('ADMIN')")
     public GiftCertificateModel updateGiftCertificatePrice(@PathVariable("id") Long id, @RequestBody Map<String, BigDecimal> requestBody) {
         if (!requestBody.containsKey("price"))
             throw new ValidationException("Request body should contain 'price' field.");
