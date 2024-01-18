@@ -39,6 +39,5 @@ spring:
       on-profile: prod
   datasource:
     url: jdbc:postgresql://prod-server:5432/gift_certificates
-    driver-class-name: org.postgresql.Driver
     username: admin
     password: password
