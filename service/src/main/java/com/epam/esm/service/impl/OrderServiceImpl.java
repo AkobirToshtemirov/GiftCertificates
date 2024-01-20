@@ -1,5 +1,7 @@
 package com.epam.esm.service.impl;
 
+import com.epam.esm.config.security.CustomeUserDetails;
+import com.epam.esm.dto.OrderDTO;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
@@ -10,6 +12,8 @@ import com.epam.esm.service.GiftCertificateService;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,11 +21,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Implementation of the {@link OrderService} interface.
- */
 @Service
 public class OrderServiceImpl implements OrderService {
+
     private final OrderRepository orderRepository;
     private final UserService userService;
     private final GiftCertificateService giftCertificateService;
@@ -32,24 +34,14 @@ public class OrderServiceImpl implements OrderService {
         this.giftCertificateService = giftCertificateService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional
-    public Order create(Long userId, Long giftCertificateId) {
-        if (Objects.isNull(userId)) {
-            throw new ValidationException("User Id cannot be empty!");
-        }
-        if (Objects.isNull(giftCertificateId)) {
-            throw new ValidationException("GiftCertificate Id cannot be empty!");
-        }
+    public Order createOrder(OrderDTO dto, Authentication authentication) {
+        validateOrderCreation(dto);
+        User user = validateUserAndGet(dto.userId());
+        GiftCertificate giftCertificate = validateGiftCertificateAndGet(dto.giftCertificateId());
 
-        User user = userService.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User is not found with id: " + userId));
-
-        GiftCertificate giftCertificate = giftCertificateService.findById(giftCertificateId)
-                .orElseThrow(() -> new NotFoundException("Gift Certificate is not found with id: " + giftCertificateId));
+        checkUserPermissionForOrderCreation(user.getId(), authentication);
 
         Order order = new Order();
         order.setGiftCertificate(giftCertificate);
@@ -60,46 +52,84 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<Order> findAllWithPage(int page, int size) {
-        try {
-            return orderRepository.findAllWithPage(page, size);
-        } catch (ValidationException e) {
-            throw new ValidationException("Page number and page size must be positive");
-        }
+        validatePageAndSize(page, size);
+        return orderRepository.findAllWithPage(page, size);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Optional<Order> findById(Long id) {
-        return orderRepository.findById(id);
+    public Order findById(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order not found with id: " + id));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Order> findOrdersInfoByUserIdWithPage(Long userId, int page, int size) {
-        userService.findById(userId).orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+    public List<Order> findOrdersByUserIdWithPage(Long userId, int page, int size, Authentication authentication) {
+        validatePageAndSize(page, size);
+        User user = validateUserAndGet(userId);
 
-        try {
-            return orderRepository.findOrdersInfoByUserIdWithPage(userId, page, size);
-        } catch (ValidationException e) {
-            throw new ValidationException("Page number and page size must be positive");
-        }
+        Long authenticatedUserId = getUserIdFromAuthentication(authentication);
+        checkUserPermissionForOrderView(user.getId(), authenticatedUserId);
+
+        return orderRepository.findOrdersInfoByUserIdWithPage(userId, page, size);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<Order> findOrdersInfoByUserId(Long userId) {
-        userService.findById(userId).orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
+    public List<Order> findOrdersByUserIdWithPageAdmin(Long userId, int page, int size) {
+        validatePageAndSize(page, size);
+        validateUserAndGet(userId);
+        return orderRepository.findOrdersInfoByUserIdWithPage(userId, page, size);
+    }
+
+    @Override
+    public List<Order> findOrdersByUserId(Long userId) {
+        validateUserAndGet(userId);
         return orderRepository.findOrdersInfoByUserId(userId);
+    }
+
+    private void validateOrderCreation(OrderDTO dto) {
+        if (Objects.isNull(dto.userId())) {
+            throw new ValidationException("User Id cannot be empty!");
+        }
+        if (Objects.isNull(dto.giftCertificateId())) {
+            throw new ValidationException("GiftCertificate Id cannot be empty!");
+        }
+    }
+
+    private User validateUserAndGet(Long userId) {
+        return userService.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User is not found with id: " + userId));
+    }
+
+    private GiftCertificate validateGiftCertificateAndGet(Long giftCertificateId) {
+        return giftCertificateService.findById(giftCertificateId)
+                .orElseThrow(() -> new NotFoundException("Gift Certificate is not found with id: " + giftCertificateId));
+    }
+
+    private void checkUserPermissionForOrderView(Long userId, Long authenticatedUserId) {
+        if (!Objects.equals(userId, authenticatedUserId)) {
+            throw new AccessDeniedException("You do not have permission to view orders for another user.");
+        }
+    }
+
+    private void checkUserPermissionForOrderCreation(Long userId, Authentication authentication) {
+        Long authenticatedUserId = getUserIdFromAuthentication(authentication);
+        if (!Objects.equals(userId, authenticatedUserId)) {
+            throw new AccessDeniedException("You do not have permission to create an order for another user.");
+        }
+    }
+
+    private void validatePageAndSize(int page, int size) {
+        if (page < 1 || size < 1) {
+            throw new ValidationException("Page number and page size must be positive");
+        }
+    }
+
+    private Long getUserIdFromAuthentication(Authentication authentication) {
+        return Optional.ofNullable(authentication.getPrincipal())
+                .filter(principal -> principal instanceof CustomeUserDetails)
+                .map(principal -> ((CustomeUserDetails) principal).getUser().getId())
+                .orElseThrow(() -> new AccessDeniedException("User information not available in the authentication."));
     }
 }
