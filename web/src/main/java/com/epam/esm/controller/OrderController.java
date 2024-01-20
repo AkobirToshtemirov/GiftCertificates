@@ -25,14 +25,14 @@ public class OrderController {
         this.orderModelAssembler = orderModelAssembler;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}")
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public OrderModel getOrder(@PathVariable("id") Long id) {
         return orderModelAssembler.toModel(orderService.findById(id));
     }
 
-    @GetMapping("/paged")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping(value = "/paged")
+    @PreAuthorize("hasRole('ADMIN')")
     public CollectionModel<OrderModel> getOrdersWithPage(
             @RequestParam(required = false, defaultValue = "1", name = "page") int page,
             @RequestParam(required = false, defaultValue = "10", name = "size") int size) {
@@ -46,7 +46,7 @@ public class OrderController {
         return orderModelAssembler.toModel(orderService.createOrder(dto, authentication));
     }
 
-    @GetMapping("/{userId}/orders")
+    @GetMapping(value = "/{userId}/user-orders")
     @PreAuthorize("isAuthenticated()")
     public CollectionModel<OrderModel> getOrdersByUserIdWithPage(
             @PathVariable("userId") Long userId,
@@ -56,7 +56,7 @@ public class OrderController {
         return orderModelAssembler.toCollectionModel(orderService.findOrdersByUserIdWithPage(userId, page, size, authentication), page, size);
     }
 
-    @GetMapping("/admin/{userId}/orders")
+    @GetMapping(value = "/admin/{userId}/orders")
     @PreAuthorize("hasRole('ADMIN')")
     public CollectionModel<OrderModel> getOrdersByUserIdWithPageAdmin(
             @PathVariable("userId") Long userId,
