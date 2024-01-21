@@ -59,18 +59,28 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order findById(Long id) {
-        return orderRepository.findById(id)
+    public Order findById(Long id, Authentication authentication) {
+        Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Order not found with id: " + id));
+
+        if (isUserAdmin(authentication)) {
+            return order;
+        } else {
+            Long userIdFromAuthentication = getUserIdFromAuthentication(authentication);
+            if (!Objects.equals(order.getUser().getId(), userIdFromAuthentication)) {
+                throw new AccessDeniedException("You do not have permission to view orders for another user.");
+            }
+        }
+        return order;
     }
 
     @Override
-    public List<Order> findOrdersByUserIdWithPage(Long userId, int page, int size, Authentication authentication) {
+    public List<Order> findOrdersByUserIdWithPage(int page, int size, Authentication authentication) {
         validatePageAndSize(page, size);
+        Long userId = getUserIdFromAuthentication(authentication);
         User user = validateUserAndGet(userId);
 
-        Long authenticatedUserId = getUserIdFromAuthentication(authentication);
-        checkUserPermissionForOrderView(user.getId(), authenticatedUserId);
+        checkUserPermissionForOrderView(user.getId(), userId);
 
         return orderRepository.findOrdersInfoByUserIdWithPage(userId, page, size);
     }
@@ -131,5 +141,10 @@ public class OrderServiceImpl implements OrderService {
                 .filter(principal -> principal instanceof CustomeUserDetails)
                 .map(principal -> ((CustomeUserDetails) principal).getUser().getId())
                 .orElseThrow(() -> new AccessDeniedException("User information not available in the authentication."));
+    }
+
+    private boolean isUserAdmin(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
     }
 }

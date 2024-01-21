@@ -26,9 +26,9 @@ public class OrderController {
     }
 
     @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public OrderModel getOrder(@PathVariable("id") Long id) {
-        return orderModelAssembler.toModel(orderService.findById(id));
+    @PreAuthorize("isAuthenticated()")
+    public OrderModel getOrder(@PathVariable("id") Long id, Authentication authentication) {
+        return orderModelAssembler.toModel(orderService.findById(id, authentication));
     }
 
     @GetMapping(value = "/paged")
@@ -41,19 +41,18 @@ public class OrderController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('USER')")
     public OrderModel createOrder(@RequestBody OrderDTO dto, Authentication authentication) {
         return orderModelAssembler.toModel(orderService.createOrder(dto, authentication));
     }
 
-    @GetMapping(value = "/{userId}/user-orders")
+    @GetMapping
     @PreAuthorize("isAuthenticated()")
     public CollectionModel<OrderModel> getOrdersByUserIdWithPage(
-            @PathVariable("userId") Long userId,
             @RequestParam(required = false, defaultValue = "1", name = "page") int page,
             @RequestParam(required = false, defaultValue = "10", name = "size") int size,
             Authentication authentication) {
-        return orderModelAssembler.toCollectionModel(orderService.findOrdersByUserIdWithPage(userId, page, size, authentication), page, size);
+        return orderModelAssembler.toCollectionModel(orderService.findOrdersByUserIdWithPage(page, size, authentication), page, size);
     }
 
     @GetMapping(value = "/admin/{userId}/orders")
