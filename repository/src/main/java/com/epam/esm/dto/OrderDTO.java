@@ -11,9 +11,6 @@ import java.io.Serializable;
 public record OrderDTO(
         @NotBlank
         @Positive
-        Long userId,
-        @NotBlank
-        @Positive
         Long giftCertificateId
 ) implements Serializable {
 }

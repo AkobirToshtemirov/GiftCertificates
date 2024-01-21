@@ -38,7 +38,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public Order createOrder(OrderDTO dto, Authentication authentication) {
         validateOrderCreation(dto);
-        User user = validateUserAndGet(dto.userId());
+        Long userId = getUserIdFromAuthentication(authentication);
+        User user = validateUserAndGet(userId);
         GiftCertificate giftCertificate = validateGiftCertificateAndGet(dto.giftCertificateId());
 
         checkUserPermissionForOrderCreation(user.getId(), authentication);
@@ -63,14 +64,18 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Order not found with id: " + id));
 
-        if (isUserAdmin(authentication)) {
-            return order;
-        } else {
-            Long userIdFromAuthentication = getUserIdFromAuthentication(authentication);
+        Long userIdFromAuthentication = getUserIdFromAuthentication(authentication);
+
+        if (!Objects.equals(order.getUser().getId(), userIdFromAuthentication)) {
+            throw new AccessDeniedException("You do not have permission to view orders for another user.");
+        }
+
+        if (!isUserAdmin(authentication)) {
             if (!Objects.equals(order.getUser().getId(), userIdFromAuthentication)) {
                 throw new AccessDeniedException("You do not have permission to view orders for another user.");
             }
         }
+
         return order;
     }
 
@@ -99,9 +104,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void validateOrderCreation(OrderDTO dto) {
-        if (Objects.isNull(dto.userId())) {
-            throw new ValidationException("User Id cannot be empty!");
-        }
         if (Objects.isNull(dto.giftCertificateId())) {
             throw new ValidationException("GiftCertificate Id cannot be empty!");
         }

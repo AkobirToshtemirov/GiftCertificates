@@ -75,7 +75,7 @@ public class UserModelAssembler extends BaseAssembler<User, UserModel> {
     private OrderModel mapToOrderModel(Order order) {
         return createOrderModel(order)
                 .add(linkTo(OrderController.class, methodOn(OrderController.class)
-                        .getOrder(order.getId()))
+                        .getOrder(order.getId(), null))
                         .withSelfRel());
     }
 
