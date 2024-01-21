@@ -1,55 +1,64 @@
 package com.epam.esm.service;
 
+import com.epam.esm.dto.OrderDTO;
 import com.epam.esm.entity.Order;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
-import java.util.Optional;
 
-/**
- * Service interface for CRUD operations on Order entities.
- */
 public interface OrderService {
-    /**
-     * Creates an Order for the specified user and gift certificate.
-     *
-     * @param userId            the ID of the user
-     * @param giftCertificateId the ID of the gift certificate
-     * @return the created Order
-     */
-    Order create(Long userId, Long giftCertificateId);
 
     /**
-     * Retrieves a paginated list of Orders.
+     * Create a new order.
      *
-     * @param page the page number (0-based)
-     * @param size the number of entities per page
-     * @return a list of Orders for the specified page
+     * @param dto            the order DTO containing user and gift certificate information
+     * @param authentication the authentication object
+     * @return the created order
+     */
+    Order createOrder(OrderDTO dto, Authentication authentication);
+
+    /**
+     * Get all orders with pagination.
+     *
+     * @param page the page number
+     * @param size the page size
+     * @return a list of orders with pagination
      */
     List<Order> findAllWithPage(int page, int size);
 
     /**
-     * Retrieves an Order by its ID.
+     * Get an order by its ID.
      *
-     * @param id the ID of the Order to be retrieved
-     * @return an {@code Optional} containing the Order, or empty if not found
+     * @param id the order ID
+     * @return the order with the specified ID
      */
-    Optional<Order> findById(Long id);
+    Order findById(Long id, Authentication authentication);
 
     /**
-     * Retrieves a paginated list of Orders with additional information by user ID.
+     * Get orders by user ID with pagination.
      *
-     * @param userId the ID of the user
-     * @param page   the page number (0-based)
-     * @param size   the number of entities per page
-     * @return a paginated list of Orders with additional information for the specified user ID
+     * @param page           the page number
+     * @param size           the page size
+     * @param authentication the authentication object
+     * @return a list of orders with pagination for the specified user
      */
-    List<Order> findOrdersInfoByUserIdWithPage(Long userId, int page, int size);
+    List<Order> findOrdersByUserIdWithPage(int page, int size, Authentication authentication);
 
     /**
-     * Retrieves a list of Orders with additional information by user ID.
+     * Get orders by user ID with pagination (for admin use).
      *
-     * @param userId the ID of the user
-     * @return a list of Orders with additional information for the specified user ID
+     * @param userId the user ID
+     * @param page   the page number
+     * @param size   the page size
+     * @return a list of orders with pagination for the specified user
      */
-    List<Order> findOrdersInfoByUserId(Long userId);
+    List<Order> findOrdersByUserIdWithPageAdmin(Long userId, int page, int size);
+
+    /**
+     * Get all orders for a user.
+     *
+     * @param userId the user ID
+     * @return a list of all orders for the specified user
+     */
+    List<Order> findOrdersByUserId(Long userId);
 }

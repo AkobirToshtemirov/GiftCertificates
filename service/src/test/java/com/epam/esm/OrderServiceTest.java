@@ -1,5 +1,7 @@
 package com.epam.esm;
 
+import com.epam.esm.config.security.CustomeUserDetails;
+import com.epam.esm.dto.OrderDTO;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
@@ -12,15 +14,18 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
 
 class OrderServiceTest {
 
@@ -55,11 +60,13 @@ class OrderServiceTest {
         giftCertificate.setName("Test Certificate");
         giftCertificate.setPrice(BigDecimal.TEN);
 
+        OrderDTO orderDTO = new OrderDTO(userId, giftCertificateId);
+
         when(userService.findById(userId)).thenReturn(Optional.of(user));
         when(giftCertificateService.findById(giftCertificateId)).thenReturn(Optional.of(giftCertificate));
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Order createdOrder = orderService.create(userId, giftCertificateId);
+        Order createdOrder = orderService.createOrder(orderDTO, mockAuthentication());
 
         assertNotNull(createdOrder);
         assertEquals(user, createdOrder.getUser());
@@ -78,10 +85,10 @@ class OrderServiceTest {
 
         when(orderRepository.findById(id)).thenReturn(Optional.of(order));
 
-        Optional<Order> foundOrder = orderService.findById(id);
+        Order foundOrder = orderService.findById(id);
 
-        assertTrue(foundOrder.isPresent());
-        assertEquals(BigDecimal.TEN, foundOrder.get().getPrice());
+        assertFalse(Objects.isNull(foundOrder));
+        assertEquals(BigDecimal.TEN, foundOrder.getPrice());
         verify(orderRepository, times(1)).findById(id);
     }
 
@@ -98,7 +105,7 @@ class OrderServiceTest {
         when(userService.findById(userId)).thenReturn(Optional.of(user));
         when(orderRepository.findOrdersInfoByUserIdWithPage(userId, page, size)).thenReturn(new ArrayList<>());
 
-        List<Order> result = orderService.findOrdersInfoByUserIdWithPage(userId, page, size);
+        List<Order> result = orderService.findOrdersByUserIdWithPage(userId, page, size, mockAuthentication());
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
@@ -116,10 +123,24 @@ class OrderServiceTest {
         when(userService.findById(userId)).thenReturn(Optional.of(user));
         when(orderRepository.findOrdersInfoByUserId(userId)).thenReturn(new ArrayList<>());
 
-        List<Order> result = orderService.findOrdersInfoByUserId(userId);
+        List<Order> result = orderService.findOrdersByUserId(userId);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(orderRepository, times(1)).findOrdersInfoByUserId(userId);
     }
+
+    private Authentication mockAuthentication() {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("testUser");
+
+        CustomeUserDetails userDetails = new CustomeUserDetails(user);
+
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+
+        return authentication;
+    }
+
 }
