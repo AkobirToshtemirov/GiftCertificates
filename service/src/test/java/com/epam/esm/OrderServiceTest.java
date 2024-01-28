@@ -19,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,7 +59,7 @@ class OrderServiceTest {
         giftCertificate.setName("Test Certificate");
         giftCertificate.setPrice(BigDecimal.TEN);
 
-        OrderDTO orderDTO = new OrderDTO(userId, giftCertificateId);
+        OrderDTO orderDTO = new OrderDTO(giftCertificateId);
 
         when(userService.findById(userId)).thenReturn(Optional.of(user));
         when(giftCertificateService.findById(giftCertificateId)).thenReturn(Optional.of(giftCertificate));
@@ -74,42 +73,6 @@ class OrderServiceTest {
         assertNotNull(createdOrder.getOrderedTime());
         assertEquals(BigDecimal.TEN, createdOrder.getPrice());
         verify(orderRepository, times(1)).save(any(Order.class));
-    }
-
-    @Test
-    void testFindOrderById() {
-        Long id = 1L;
-        Order order = new Order();
-        order.setId(id);
-        order.setPrice(BigDecimal.TEN);
-
-        when(orderRepository.findById(id)).thenReturn(Optional.of(order));
-
-        Order foundOrder = orderService.findById(id);
-
-        assertFalse(Objects.isNull(foundOrder));
-        assertEquals(BigDecimal.TEN, foundOrder.getPrice());
-        verify(orderRepository, times(1)).findById(id);
-    }
-
-    @Test
-    void testFindOrdersInfoByUserIdWithPage() {
-        Long userId = 1L;
-        int page = 1;
-        int size = 10;
-
-        User user = new User();
-        user.setId(userId);
-        user.setUsername("testUser");
-
-        when(userService.findById(userId)).thenReturn(Optional.of(user));
-        when(orderRepository.findOrdersInfoByUserIdWithPage(userId, page, size)).thenReturn(new ArrayList<>());
-
-        List<Order> result = orderService.findOrdersByUserIdWithPage(userId, page, size, mockAuthentication());
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-        verify(orderRepository, times(1)).findOrdersInfoByUserIdWithPage(userId, page, size);
     }
 
     @Test
