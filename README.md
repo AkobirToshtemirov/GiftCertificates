@@ -1,5 +1,19 @@
 # Task | GiftCertificates 
 
+## Jenkins Credentials
+
+- **Administrator User**:
+  - Username: admin
+  - Password: [admin]
+
+- **Developer User**:
+  - Username: user
+  - Password: [user]
+
+## Usage
+1. Clone this repository.
+2. Follow the instructions in the README file to set up and run the project.
+
 **Instructions to run the project:**
 
 Go to the project direcotry and run the following command(Make sure maven is installed to your laptop/desktop):
